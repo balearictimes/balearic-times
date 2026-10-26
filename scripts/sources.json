@@ -1,47 +1,66 @@
 {
   "_readme": [
-    "Only add sources whose content is published FOR reuse: official press rooms (Govern, Consells, Ajuntaments),",
+    "Only add sources whose content is published FOR reuse: official press rooms (Govern, Consells, Ajuntaments, ports, universities),",
     "public bodies, statistics offices, clubs' and companies' own press releases. Check each site's 'Aviso legal'.",
     "Do NOT add other newspapers (Diario de Mallorca, Ultima Hora, Majorca Daily Bulletin, Mallorca Zeitung, etc.).",
-    "type: 'rss' (RSS or Atom feed URL). Set enabled: true once you have pasted and checked a real feed URL.",
-    "maxPerRun limits how many stories one source can add each run."
+    "type 'rss': an RSS or Atom feed URL.  type 'html': a news LIST page plus linkPattern, a regular expression that matches the article links on that page.",
+    "enabled: true switches a source on.  category is only the fallback: the AI chooses the real section from the story.",
+    "mustMatch (optional): a regular expression; only stories that mention it are used (for national feeds).",
+    "firstRun (optional, html only): how many of the newest items to take the very first time (default 2).",
+    "maxPerRun limits how many stories one source can add each run (3 runs a day)."
   ],
-  "maxPerRun": 4,
+  "maxPerRun": 3,
   "sources": [
     {
-      "name": "Govern de les Illes Balears – press releases",
+      "name": "Govern de les Illes Balears – news and press releases",
       "type": "rss",
-      "url": "PASTE-THE-RSS-URL-OF-THE-CAIB-PRESS-ROOM-HERE",
+      "url": "https://www.caib.es/pidip2front/pidipRSS?opcio=getRSS&grup=noticies&lang=ca",
       "category": "politics",
-      "enabled": false
+      "enabled": true,
+      "note": "Official open data of the Govern (Creative Commons Attribution). Catalan."
     },
     {
-      "name": "Consell de Mallorca – press releases",
+      "name": "Consell de Mallorca – news",
+      "type": "html",
+      "url": "https://www.conselldemallorca.es/totes-les-noticies",
+      "linkPattern": "^https://www\\.conselldemallorca\\.es/totes-les-noticies/-/asset_publisher/[^/]+/content/",
+      "category": "news",
+      "enabled": true,
+      "note": "No RSS exists, so the news list page is read. Official council press releases, in Catalan."
+    },
+    {
+      "name": "Consell d'Eivissa – news",
+      "type": "html",
+      "url": "https://www.conselldeivissa.es/actualitat/noticias",
+      "linkPattern": "^https://www\\.conselldeivissa\\.es/es/actualidad/noticias/-/asset_publisher/[^/]+/content/id/\\d+/maximized",
+      "category": "news",
+      "enabled": true,
+      "note": "No RSS exists, so the news list page is read. Official council press releases, in Catalan."
+    },
+    {
+      "name": "Autoritat Portuària de Balears – news",
+      "type": "html",
+      "url": "https://www.portsdebalears.com/es/noticias",
+      "linkPattern": "^https://www\\.portsdebalears\\.com/es/noticias/[^/?#]{15,}$",
+      "category": "business",
+      "enabled": true,
+      "note": "Ports of Palma, Eivissa, Maó, Alcúdia and La Savina. Official press releases, in Spanish."
+    },
+    {
+      "name": "Ajuntament de Palma – news",
+      "type": "rss",
+      "url": "https://noticies.palma.cat/inici/-/asset_publisher/q5ypd8S7ynNq/rss",
+      "category": "news",
+      "enabled": false,
+      "note": "RSS link found on palma.es. Not tested. Turn on, run Autopost once, and check the log before keeping it."
+    },
+    {
+      "name": "EXAMPLE of a national feed: only keep stories that mention the islands",
       "type": "rss",
       "url": "PASTE-RSS-URL",
       "category": "news",
-      "enabled": false
-    },
-    {
-      "name": "Ajuntament de Palma – press releases",
-      "type": "rss",
-      "url": "PASTE-RSS-URL",
-      "category": "news",
-      "enabled": false
-    },
-    {
-      "name": "IBESTAT – statistics news",
-      "type": "rss",
-      "url": "PASTE-RSS-URL",
-      "category": "economy",
-      "enabled": false
-    },
-    {
-      "name": "European Commission – press corner",
-      "type": "rss",
-      "url": "PASTE-RSS-URL",
-      "category": "politics",
-      "enabled": false
+      "enabled": false,
+      "mustMatch": "balear|mallorca|menorca|ibiza|eivissa|formentera|palma"
     }
   ]
 }

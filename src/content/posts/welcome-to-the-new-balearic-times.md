@@ -15,7 +15,7 @@ Balearic Times has moved to a new, faster website. You will find the same sectio
 
 Every morning we now publish a weather forecast for all four islands, built from open weather data, with temperatures, the chance of rain, wind, UV levels, sea conditions and a three-day outlook. The live weather widget on every page shows current conditions for Palma, Maó, Ibiza Town and Formentera.
 
-Our stories are built from primary sources such as announcements from the Govern de les Illes Balears, the island councils and town halls, and we link to the source at the end of each article so you can check it for yourself. You can read how we work in our [editorial policy](/editorial-policy/).
+Our stories are written in our own words from primary sources such as announcements from the Govern de les Illes Balears, the island councils and town halls. Articles are also available in Spanish, French and German. You can read how we work in our [editorial policy](/editorial-policy/).
 
 ## Get in touch
 

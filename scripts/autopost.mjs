@@ -24,7 +24,7 @@ import path from 'node:path';
 import { XMLParser } from 'fast-xml-parser';
 import { parseHTML } from 'linkedom';
 import { Readability } from '@mozilla/readability';
-import { ROOT, CATEGORIES, writePost, postExists, uniqueSlug, slugify, fetchText } from './lib.mjs';
+import { ROOT, CATEGORIES, writePost, postExists, uniqueSlug, slugify, fetchText, allowedByRobots } from './lib.mjs';
 
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
@@ -186,7 +186,16 @@ Rules:
 - Use 2–4 short subheadings (## in Markdown). British English. Neutral, factual tone. No hype, no clickbait, no emojis.
 - Length: 450–850 words when the source has enough substance. If the source is short, write a shorter article. Never pad.
 - Keep local names in their original form (e.g. Consell de Mallorca, Son Espases) with a brief English explanation the first time.
-- Pick the best category from: ${CATEGORIES.filter((c) => c !== 'weather').join(', ')}.
+- Pick the category by the MAIN SUBJECT of the story, from this list only:
+  news = general local news, accidents, emergencies, transport, crime, community and anything that fits nowhere else;
+  business = companies, tourism industry, hotels, airlines, property, jobs, investments;
+  economy = prices, wages, taxes, budgets, public finances, housing market, statistics and figures;
+  health = hospitals, doctors, public health, medicines, wellbeing;
+  lifestyle = food, travel, events, leisure, consumer items, daily life;
+  politics = Govern, Parlament, island councils, town halls, parties, elections, laws and regulations;
+  culture = art, music, festivals, theatre, cinema, books, heritage, traditions;
+  sports = football, basketball, sailing, cycling, running, any sport;
+  tech = technology, digital, start-ups, science, energy and environment innovation.
 
 Reply with ONLY a JSON object, no other text:
 {"title": "...", "excerpt": "one-sentence summary under 200 characters", "category": "...", "body": "the article in Markdown, without the title"}`;
@@ -228,6 +237,21 @@ function readFeed(raw) {
   })).filter((i) => i.link && i.title);
 }
 
+// For sites without RSS: read the news LIST page and pick out the article links that match `linkPattern`.
+function readList(html, baseUrl, pattern) {
+  const { document } = parseHTML(html);
+  const re = new RegExp(pattern);
+  const byLink = new Map();
+  for (const a of document.querySelectorAll('a[href]')) {
+    let link;
+    try { link = new URL(a.getAttribute('href'), baseUrl).href.split('#')[0]; } catch { continue; }
+    if (!re.test(link)) continue;
+    const text = stripTags(a.textContent || a.getAttribute('title') || '');
+    if (!byLink.has(link) || text.length > byLink.get(link).length) byLink.set(link, text);
+  }
+  return [...byLink].filter(([, t]) => t.length >= 15).map(([link, title]) => ({ link, title, date: null, summary: '' }));
+}
+
 async function articleText(url) {
   const html = await fetchText(url);
   const { document } = parseHTML(html);
@@ -246,7 +270,18 @@ async function newsPosts() {
 
   for (const src of enabled) {
     let items = [];
-    try { items = readFeed(await fetchText(src.url)); } catch (e) { log(`news: feed failed ${src.name}: ${e.message}`); continue; }
+    try {
+      const raw = await fetchText(src.url);
+      items = src.type === 'html' ? readList(raw, src.url, src.linkPattern) : readFeed(raw);
+    } catch (e) { log(`news: source failed ${src.name}: ${e.message}`); continue; }
+    // List pages have no dates: the first time we see one, only take the newest few so we don't dump its whole history
+    if (src.type === 'html') {
+      seen.__init = seen.__init ?? {};
+      if (!seen.__init[src.name]) {
+        items.slice(src.firstRun ?? 2).forEach((i) => { seen[i.link] = 'backlog'; });
+        seen.__init[src.name] = new Date().toISOString();
+      }
+    }
     let made = 0;
     for (const it of items) {
       if (made >= max) break;
@@ -255,9 +290,11 @@ async function newsPosts() {
 
       try {
         let text = '';
-        try { text = await articleText(it.link); } catch {}
+        if (await allowedByRobots(it.link)) { try { text = await articleText(it.link); } catch {} }
         if (text.length < 400) text = `${it.title}. ${it.summary}`;
         if (text.length < 300) { seen[it.link] = 'too-short'; log(`skip (too short): ${it.title}`); continue; }
+        // national / general feeds: only stories that mention the islands
+        if (src.mustMatch && !new RegExp(src.mustMatch, 'i').test(`${it.title} ${text}`)) { seen[it.link] = 'not-local'; continue; }
 
         const out = parseJSON(await callAI(`Source: ${src.name}\nURL: ${it.link}\nTitle: ${it.title}\n\n${text}`));
         const words = String(out.body ?? '').split(/\s+/).length;

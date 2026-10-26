@@ -83,3 +83,32 @@ export function detectLang(text) {
   for (const w of words) for (const [k, list] of Object.entries(STOP)) if (list.includes(w)) score[k]++;
   return Object.entries(score).sort((a, b) => b[1] - a[1])[0][0];
 }
+
+// Polite crawling: before reading an ARTICLE page, check the site's robots.txt (feeds you list yourself are fine).
+const robotsCache = new Map();
+export async function allowedByRobots(url) {
+  try {
+    const u = new URL(url);
+    if (!robotsCache.has(u.origin)) {
+      let rules = [];
+      try {
+        const txt = await fetchText(`${u.origin}/robots.txt`);
+        let applies = false;
+        for (const raw of txt.split('\n')) {
+          const line = raw.split('#')[0].trim();
+          const m = line.match(/^(user-agent|disallow|allow):\s*(.*)$/i);
+          if (!m) continue;
+          const k = m[1].toLowerCase(), v = m[2].trim();
+          if (k === 'user-agent') { applies = v === '*' || /balearictimesbot/i.test(v); }
+          else if (applies && k === 'disallow' && v) rules.push(v);
+        }
+      } catch { rules = []; }
+      robotsCache.set(u.origin, rules);
+    }
+    const target = u.pathname + u.search;
+    return !robotsCache.get(u.origin).some((r) => {
+      const prefix = r.split('*')[0].replace(/\$$/, '');
+      return prefix && target.startsWith(prefix);
+    });
+  } catch { return true; }
+}

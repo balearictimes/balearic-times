@@ -62,7 +62,7 @@ function currentState(lang, slug) {
   const f = path.join(OUT_DIR, lang, `${slug}.md`);
   if (!fs.existsSync(f)) return null;
   const raw = fs.readFileSync(f, 'utf8');
-  return { reviewed: /^reviewed:\s*true/m.test(raw), hash: raw.match(/^sourceHash:\s*"?([\w]+)"?/m)?.[1] };
+  return { reviewed: /^reviewed:\s*true/m.test(raw), hash: raw.match(/^sourceHash:\s*"?([\w]+)"?/m)?.[1], body: raw.replace(/^---\n[\s\S]*?\n---\n/, '') };
 }
 
 // ---------- translate ----------
@@ -72,6 +72,7 @@ Translate the English news article you are given into ${lang.name}, as a profess
 Rules:
 - Natural, fluent, neutral newspaper style in ${lang.name}. Do not translate word for word.
 - Keep ALL Markdown structure exactly: headings (##), paragraphs, bullet lists, tables, bold, links and their URLs.
+- TRANSLATE THE HEADINGS TOO (every line starting with ##). Never leave a heading in English.
 - Keep proper names, place names, organisations and institutions in their usual local form (Consell de Mallorca, Son Espases, RCD Mallorca, Govern, Palma). Use the established ${lang.name} name where there is one (e.g. Majorca/Mallorca as is normal in ${lang.name}).
 - Keep numbers, dates, money amounts and quotations accurate. Convert nothing. Add nothing. Leave nothing out.
 - Do not add comments, notes or explanations.
@@ -90,6 +91,14 @@ function parse(out) {
 }
 
 const words = (s) => (s.match(/\S+/g) ?? []).length;
+const headingsOf = (md) => (md.match(/^#{2,4}\s+(.+)$/gm) ?? []).map((h) => h.replace(/^#+\s+/, '').trim());
+// English headings left untouched in the translation (only headings of 2+ words count; "Mallorca" is the same in every language)
+export function untranslatedHeadings(srcBody, outBody) {
+  const en = headingsOf(srcBody).filter((h) => h.split(/\s+/).length >= 2);
+  const out = new Set(headingsOf(outBody).map((h) => h.toLowerCase()));
+  return en.filter((h) => out.has(h.toLowerCase()));
+}
+
 function validate(src, t, lang) {
   if (!t.title || t.title.length > 220) throw new Error('bad title');
   const ratio = words(t.body) / Math.max(1, words(src.body));
@@ -98,6 +107,8 @@ function validate(src, t, lang) {
   if (paras(t.body) < paras(src.body) * 0.6) throw new Error('paragraphs missing');
   if (detectLang(t.body) === 'en') throw new Error('still looks English');
   if (/^(here is|sure|of course|note:)/i.test(t.body)) throw new Error('chatty answer');
+  const left = untranslatedHeadings(src.body, t.body);
+  if (left.length) throw new Error(`headings not translated: ${left.slice(0, 2).join(' / ')}`);
 }
 
 async function translateOne(src, lang) {
@@ -139,7 +150,8 @@ for (const p of posts) for (const l of LANGS) {
   if (ONLY_LANG && l.code !== ONLY_LANG) continue;
   const st = currentState(l.code, p.slug);
   if (st?.reviewed) continue;
-  if (st && st.hash === hashOf(p)) continue;
+  // up to date — unless the headings were left in English (older runs did that): then redo it
+  if (st && st.hash === hashOf(p) && untranslatedHeadings(p.body, st.body).length === 0) continue;
   todo.push({ p, l, update: !!st });
 }
 console.log(`${posts.length} English articles · ${todo.length} translations to do · provider ${providerName()} · this run up to ${MAX}`);
