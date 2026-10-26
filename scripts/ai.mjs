@@ -15,7 +15,31 @@ export function providerName() {
   return (e.AI_PROVIDER || (e.ANTHROPIC_API_KEY ? 'anthropic' : e.OPENROUTER_API_KEY ? 'openrouter' : e.GEMINI_API_KEY ? 'gemini' : 'workers-ai')).toLowerCase();
 }
 
-const DEFAULT_OPENROUTER = 'meta-llama/llama-3.3-70b-instruct:free,google/gemma-3-27b-it:free,mistralai/mistral-small-3.1-24b-instruct:free';
+// Free model names change all the time, so instead of a fixed list we ask OpenRouter which models are free
+// right now and take the largest ones. Set AI_MODEL to override (comma-separated, tried in order).
+const FALLBACK_OPENROUTER = 'meta-llama/llama-3.3-70b-instruct:free,qwen/qwen-2.5-72b-instruct:free,google/gemma-3-27b-it:free';
+let freeCache = null;
+const badModels = new Set();
+
+async function freeModels() {
+  if (freeCache) return freeCache;
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/models', { signal: AbortSignal.timeout(30000) });
+    const j = await res.json();
+    const sizeOf = (id) => Number(id.match(/[-_](\d{1,4})b\b/i)?.[1] ?? 30);
+    const list = (j.data ?? [])
+      .filter((m) => m.id.endsWith(':free') || (Number(m.pricing?.prompt) === 0 && Number(m.pricing?.completion) === 0))
+      .filter((m) => (m.context_length ?? 0) >= 16000)
+      .filter((m) => !/vision|image|coder|embed|guard|audio|safeguard|moderation|lyria|-vl/i.test(m.id))
+      .filter((m) => !m.architecture?.output_modalities || m.architecture.output_modalities.includes('text'))
+      .filter((m) => !/^openrouter\//.test(m.id))
+      .sort((a, b) => sizeOf(b.id) - sizeOf(a.id))
+      .map((m) => m.id);
+    if (list.length) { freeCache = list.slice(0, 8); console.log(`Free models today: ${freeCache.join(', ')}`); return freeCache; }
+  } catch (e) { console.log(`Could not list free models (${e.message}); using the built-in list.`); }
+  freeCache = FALLBACK_OPENROUTER.split(',');
+  return freeCache;
+}
 
 async function json(res, label) {
   const text = await res.text();
@@ -45,8 +69,9 @@ export async function callAI({ system, user, maxTokens = 3000 }) {
 
   if (provider === 'openrouter') {
     if (!e.OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY missing');
-    const models = (e.AI_MODEL || DEFAULT_OPENROUTER).split(',').map((s) => s.trim()).filter(Boolean);
-    let lastErr;
+    const models = (e.AI_MODEL ? e.AI_MODEL.split(',').map((x) => x.trim()).filter(Boolean) : await freeModels()).filter((m) => !badModels.has(m));
+    if (!models.length) throw new Error('OpenRouter: no working free model left. Set the variable AI_MODEL to a model from openrouter.ai/models?q=free');
+    const errors = [];
     for (const model of models) {
       try {
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -60,16 +85,17 @@ export async function callAI({ system, user, maxTokens = 3000 }) {
           body: JSON.stringify({ model, max_tokens: maxTokens, temperature: 0.3, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
           signal: AbortSignal.timeout(180000),
         });
-        const j = await json(res, `OpenRouter ${model}`);
+        const j = await json(res, model);
         const out = j.choices?.[0]?.message?.content;
-        if (!out) throw new Error(`OpenRouter ${model}: empty answer`);
+        if (!out) throw new Error(`${model}: empty answer`);
         return out;
       } catch (err) {
-        if (err instanceof QuotaError && /free-models-per-day|per.?day/i.test(err.message + '')) throw err;
-        lastErr = err; // try the next model
+        if (err instanceof QuotaError && /per.?day/i.test(err.message)) throw err;
+        if (/ 404|no endpoints|unavailable|not found|\b400\b|\b403\b/i.test(err.message)) badModels.add(model); // don't keep asking a dead model
+        errors.push(String(err.message).slice(0, 140));
       }
     }
-    throw lastErr;
+    throw new Error(`all free models failed: ${errors.join(' | ')}`);
   }
 
   if (provider === 'gemini') {
