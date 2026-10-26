@@ -1,0 +1,9 @@
+---
+import Article from '../../views/Article.astro';
+import { articlePaths } from '../../data/routes';
+import { OTHER_LANGS } from '../../i18n';
+export async function getStaticPaths() {
+  return (await Promise.all(OTHER_LANGS.map((l) => articlePaths(l.code)))).flat();
+}
+---
+<Article {...Astro.props} />

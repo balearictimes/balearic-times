@@ -1,0 +1,6 @@
+---
+import Island from '../../views/Island.astro';
+import { islandPaths } from '../../data/routes';
+export const getStaticPaths = () => islandPaths('en');
+---
+<Island lang="en" island={Astro.params.island!} />

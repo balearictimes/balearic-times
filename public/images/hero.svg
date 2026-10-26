@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="bw"><feColorMatrix type="saturate" values="0"/></filter>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a0b0b"/>
+      <stop offset=".55" stop-color="#b3261e"/>
+      <stop offset="1" stop-color="#f29a4a"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a1712"/>
+      <stop offset="1" stop-color="#200404"/>
+    </linearGradient>
+    <radialGradient id="sun" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffe2b0"/>
+      <stop offset=".6" stop-color="#ffb35c"/>
+      <stop offset="1" stop-color="#ffb35c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g filter="url(#bw)">
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <circle cx="1380" cy="560" r="260" fill="url(#sun)" opacity=".9"/>
+  <circle cx="1380" cy="560" r="120" fill="#ffd79a"/>
+  <!-- distant hills (Serra de Tramuntana) -->
+  <path d="M0 640 C160 560 300 600 420 570 C560 535 640 600 760 585 C900 568 980 520 1120 548 C1260 576 1340 530 1500 555 C1650 580 1780 545 1920 575 V760 H0Z" fill="#5a1410" opacity=".75"/>
+  <!-- old town + cathedral silhouette -->
+  <g fill="#1d0504">
+    <path d="M0 760 V700 h60 v-20 h40 v30 h50 v-40 h30 v40 h70 v-25 h40 v35 h60 v-30 h20 v30 h40 V760Z"/>
+    <!-- La Seu: nave, buttresses, towers -->
+    <path d="M430 760 V560 l20 -10 20 10 V500 h8 v-28 l6 -20 6 20 v28 h8 v60 l20 -12 20 12 v-60 h8 v-36 l6 -22 6 22 v36 h8 v60 l20 -12 20 12 v-60 h8 v-36 l6 -22 6 22 v36 h8 v60 l20 -12 20 12 v-60 h8 v-36 l6 -22 6 22 v36 h8 v60 l20 -12 20 12 v-60 h8 v-28 l6 -20 6 20 v28 h8 V560 l20 -10 20 10 v-20 h30 V460 h14 v-40 l12 -30 12 30 v40 h14 V760Z"/>
+    <path d="M440 760 V640 h420 V760Z"/>
+    <!-- rose window hint -->
+    <circle cx="560" cy="610" r="14" fill="#7a1712"/>
+    <!-- Almudaina / town -->
+    <path d="M900 760 V690 h50 v-30 h16 v-14 h10 v14 h16 v30 h60 v-20 h40 v20 h50 v-40 h24 v40 h80 V760Z"/>
+    <!-- Bellver castle on the hill -->
+    <path d="M1480 610 a30 30 0 1 1 60 0 v10 h-60z"/>
+    <rect x="1500" y="572" width="20" height="26"/>
+    <path d="M1250 760 C1330 690 1420 640 1520 625 C1640 610 1760 660 1920 690 V760Z"/>
+    <!-- palms -->
+    <g transform="translate(1720 740)">
+      <path d="M0 0 q6 -110 -4 -170" stroke="#1d0504" stroke-width="9" fill="none"/>
+      <path d="M-4 -170 q-60 -10 -90 30 q50 -30 90 -24 q-40 -40 -100 -20 q60 -10 100 18 q-20 -60 -70 -70 q50 10 72 66 q20 -60 80 -60 q-50 10 -76 64 q60 -20 100 10 q-50 -14 -98 4 q50 10 80 50 q-40 -30 -82 -32z"/>
+    </g>
+    <g transform="translate(1820 750) scale(.8)">
+      <path d="M0 0 q6 -110 -4 -170" stroke="#1d0504" stroke-width="9" fill="none"/>
+      <path d="M-4 -170 q-60 -10 -90 30 q50 -30 90 -24 q-40 -40 -100 -20 q60 -10 100 18 q-20 -60 -70 -70 q50 10 72 66 q20 -60 80 -60 q-50 10 -76 64 q60 -20 100 10 q-50 -14 -98 4 q50 10 80 50 q-40 -30 -82 -32z"/>
+    </g>
+  </g>
+  <!-- sea with sun path -->
+  <rect y="760" width="1920" height="320" fill="url(#sea)"/>
+  <g fill="#ffcf8a" opacity=".55">
+    <rect x="1300" y="780" width="160" height="5" rx="2"/>
+    <rect x="1320" y="805" width="120" height="4" rx="2"/>
+    <rect x="1290" y="832" width="180" height="4" rx="2"/>
+    <rect x="1335" y="862" width="90" height="4" rx="2"/>
+    <rect x="1310" y="896" width="140" height="3" rx="2"/>
+    <rect x="1350" y="935" width="60" height="3" rx="2"/>
+  </g>
+  <g fill="none" stroke="#ff9a7a" stroke-opacity=".18" stroke-width="3">
+    <path d="M0 820 q80 -12 160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0"/>
+    <path d="M0 900 q80 -12 160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0"/>
+    <path d="M0 990 q80 -12 160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0 t160 0"/>
+  </g>
+  <!-- sailing boat -->
+  <g transform="translate(760 850)" fill="#1d0504">
+    <path d="M0 0 h90 l-14 16 h-62z"/>
+    <path d="M44 -4 V-90 L88 -6z"/>
+    <path d="M40 -4 V-70 L8 -6z"/>
+  </g>
+</g>
+</svg>

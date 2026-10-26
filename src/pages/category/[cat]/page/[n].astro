@@ -1,0 +1,8 @@
+---
+import CategoryPage from '../../../../components/CategoryPage.astro';
+import { categoryPaths } from '../../../../data/routes';
+export const getStaticPaths = () => categoryPaths('en', true);
+const { cat, n } = Astro.params;
+const { items, pages } = Astro.props;
+---
+<CategoryPage cat={cat!} items={items} page={Number(n)} pages={pages} lang="en" />

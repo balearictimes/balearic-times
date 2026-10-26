@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import PageBanner from '../components/PageBanner.astro';
+import NewsCard from '../components/NewsCard.astro';
+import { ISLANDS } from '../data/site';
+import { getPostsFor, postsForIsland } from '../data/posts';
+import { uiOf, islandLabel, islandBlurb, fmt, lp, DEFAULT_LANG } from '../i18n';
+
+interface Props { lang: string; island: string }
+const { lang, island: slug } = Astro.props;
+const ui = uiOf(lang);
+const name = islandLabel(lang, slug);
+const blurb = islandBlurb(lang, slug);
+const items = postsForIsland(await getPostsFor(lang), slug).slice(0, 48);
+---
+<Base title={fmt(ui.islandTitle, { name })} description={fmt(ui.islandDesc, { name, blurb })} lang={lang} altPath={`/island/${slug}/`} noindex={items.length === 0}>
+  <PageBanner title={fmt(ui.islandBanner, { name })} />
+  <div class="sf-news-section section-padding bg-white">
+    <div class="container">
+      <div class="page-intro">
+        <h2>{fmt(ui.latestFrom, { name })}</h2>
+        <p>{blurb}</p>
+      </div>
+      <div class="news-tabs">
+        {ISLANDS.map((i) => <a href={lp(lang, `/island/${i.slug}/`)} class={i.slug === slug ? 'active' : ''}>{islandLabel(lang, i.slug)}</a>)}
+      </div>
+      {items.length ? <div class="cms-grid">{items.map((p) => <NewsCard post={p} />)}</div> : (
+        <p class="empty-note">{ui.noStories} {lang !== DEFAULT_LANG && <a href={`/island/${slug}/`}>{ui.readInEnglish}</a>}</p>
+      )}
+    </div>
+  </div>
+</Base>

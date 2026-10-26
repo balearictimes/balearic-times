@@ -1,0 +1,47 @@
+{
+  "_readme": [
+    "Only add sources whose content is published FOR reuse: official press rooms (Govern, Consells, Ajuntaments),",
+    "public bodies, statistics offices, clubs' and companies' own press releases. Check each site's 'Aviso legal'.",
+    "Do NOT add other newspapers (Diario de Mallorca, Ultima Hora, Majorca Daily Bulletin, Mallorca Zeitung, etc.).",
+    "type: 'rss' (RSS or Atom feed URL). Set enabled: true once you have pasted and checked a real feed URL.",
+    "maxPerRun limits how many stories one source can add each run."
+  ],
+  "maxPerRun": 4,
+  "sources": [
+    {
+      "name": "Govern de les Illes Balears – press releases",
+      "type": "rss",
+      "url": "PASTE-THE-RSS-URL-OF-THE-CAIB-PRESS-ROOM-HERE",
+      "category": "politics",
+      "enabled": false
+    },
+    {
+      "name": "Consell de Mallorca – press releases",
+      "type": "rss",
+      "url": "PASTE-RSS-URL",
+      "category": "news",
+      "enabled": false
+    },
+    {
+      "name": "Ajuntament de Palma – press releases",
+      "type": "rss",
+      "url": "PASTE-RSS-URL",
+      "category": "news",
+      "enabled": false
+    },
+    {
+      "name": "IBESTAT – statistics news",
+      "type": "rss",
+      "url": "PASTE-RSS-URL",
+      "category": "economy",
+      "enabled": false
+    },
+    {
+      "name": "European Commission – press corner",
+      "type": "rss",
+      "url": "PASTE-RSS-URL",
+      "category": "politics",
+      "enabled": false
+    }
+  ]
+}

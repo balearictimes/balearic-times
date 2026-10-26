@@ -1,0 +1,18 @@
+---
+// Simple content pages (About, Contact, policies) in the Star FM style.
+import Base from './Base.astro';
+import PageBanner from '../components/PageBanner.astro';
+interface Props { title: string; intro?: string; description?: string; noindex?: boolean; lang?: string; altPath?: string }
+const { title, intro, description, noindex, lang = 'en', altPath } = Astro.props;
+---
+<Base title={title} description={description ?? intro} noindex={noindex} lang={lang} altPath={altPath}>
+  <PageBanner title={title} />
+  <div class="news-copy-wrap section-padding bg-white">
+    <div class="container">
+      <div class="news-copy">
+        {intro && <h2>{intro}</h2>}
+        <slot />
+      </div>
+    </div>
+  </div>
+</Base>

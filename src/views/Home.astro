@@ -1,0 +1,145 @@
+---
+import Base from '../layouts/Base.astro';
+import NewsCard from '../components/NewsCard.astro';
+import HeadlineRow from '../components/HeadlineRow.astro';
+import AdSlot from '../components/AdSlot.astro';
+import Newsletter from '../components/Newsletter.astro';
+import Weather from '../components/Weather.astro';
+import { SITE, ISLANDS, CATEGORIES } from '../data/site';
+import { getPostsFor, postUrl, hasPhoto, postsForIsland } from '../data/posts';
+import { uiOf, islandLabel, islandBlurb, fmt, lp } from '../i18n';
+
+interface Props { lang?: string }
+const { lang = 'en' } = Astro.props;
+const ui = uiOf(lang);
+const posts = await getPostsFor(lang);
+const lead = posts.find((p) => p.data.featured) ?? posts[0];
+const heroBg = lead && hasPhoto(lead) ? lead.data.image : SITE.heroImage;
+const latest = posts.filter((p) => p !== lead).slice(0, 6);
+
+// Red "Top Stories" band: the newest story from each section (Star FM's programme list)
+const seen = new Set([lead?.id, ...latest.map((p) => p.id)]);
+const bySection = CATEGORIES.map((c) => posts.find((p) => p.data.category === c.slug && !seen.has(p.id)))
+  .filter((p): p is NonNullable<typeof p> => !!p)
+  .slice(0, 8);
+const pool = bySection.length >= 4 ? bySection : posts.filter((p) => p !== lead).slice(6, 14);
+const topStories = pool.slice(0, pool.length - (pool.length % 2)); // even number keeps the two columns level
+const islandCounts = Object.fromEntries(ISLANDS.map((i) => [i.slug, postsForIsland(posts, i.slug).length]));
+const L = (p: string) => lp(lang, p);
+---
+<Base description={ui.siteDescription} lang={lang} altPath="/">
+  <div class="home-banner home-banner--hero" style={`background-image:url('${heroBg}')`}>
+    <div class="container">
+      <div class="home-content">
+        <div class="sf-logo-intro"><span>Balearic Times</span></div>
+        {lead ? (
+          <>
+            <span class="hero-kicker">{ISLANDS.map((i) => islandLabel(lang, i.slug)).join(' · ')}</span>
+            <h2><a href={postUrl(lead)}>{lead.data.title}</a></h2>
+            <a href={postUrl(lead)} class="btn btn-primary">{ui.readMoreCaps} <i class="fa fa-chevron-circle-right"></i></a>
+          </>
+        ) : (
+          <>
+            <br />
+            <a href={L('/about-us/')} class="btn btn-primary">{ui.learnMoreCaps} <i class="fa fa-chevron-circle-right"></i></a>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-news-section section-padding bg-white">
+    <div class="container">
+      <div class="section-title">
+        <p class="sk">Balearic Times</p>
+        <h2>{ui.latestHeading}</h2>
+      </div>
+      {latest.length ? (
+        <div class="cms-grid">{latest.map((p) => <NewsCard post={p} />)}</div>
+      ) : <p class="empty-note">{ui.emptyLatest}</p>}
+      <div class="view-all"><a class="btn btn-primary no-icon" href={L('/category/news/')}>{ui.viewAllNews}</a></div>
+    </div>
+  </div>
+
+  <AdSlot slot="" lang={lang} />
+
+  <div class="about-section section-padding">
+    <div class="section-title">
+      <p class="sk">Balearic Times</p>
+      <h1 class="page-h1">{ui.homeH1}</h1>
+    </div>
+    <div class="about-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="about-image about-image--logo">
+              <img class="img-responsive" src="/images/logo-big.svg" alt={SITE.name} width="560" height="315" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="about-info">
+              <h2 class="about-tagline">{ui.aboutTagline}</h2>
+              <p>{ui.aboutP1}</p>
+              <h2 class="about-subhead">{ui.aboutSub}</h2>
+              <p>{ui.aboutP2}</p>
+              <div class="about-cta"><a class="btn btn-primary" href={L('/about-us/')}>{ui.learnMoreCaps} <i class="fa fa-chevron-circle-right"></i></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-genres-section section-padding bg-white">
+    <div class="container">
+      <div class="section-title">
+        <p class="sk">{ui.ourIslands}</p>
+        <h2>{ui.acrossBalearics}</h2>
+        <p class="section-intro">{ui.islandsIntro}</p>
+      </div>
+      <div class="row row-eq sf-genres">
+        {ISLANDS.map((i) => (
+          <div class="col-md-3 col-sm-6">
+            <a href={L(`/island/${i.slug}/`)} class={`sf-genre sf-genre-${i.slug}`}>
+              <span class="sf-genre-name">{islandLabel(lang, i.slug)}</span>
+              <span class="sf-genre-desc">{islandBlurb(lang, i.slug)}</span>
+              <span class="sf-genre-link">{islandCounts[i.slug] ? fmt(ui.nStories, { n: islandCounts[i.slug] }) : ui.latestNews} <i class="fa fa-arrow-right"></i></span>
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {topStories.length > 0 && (
+    <div class="gallery-section programs-red" id="top-stories">
+      <div class="container">
+        <div class="section-title">
+          <h2>{ui.topStories}</h2>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><ul>{topStories.filter((_, i) => i % 2 === 0).map((p) => <HeadlineRow post={p} />)}</ul></div>
+          <div class="col-md-6"><ul>{topStories.filter((_, i) => i % 2 === 1).map((p) => <HeadlineRow post={p} />)}</ul></div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <AdSlot slot="" lang={lang} />
+
+  <div class="twitter-feed section-padding bg-white">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6"><Newsletter lang={lang} /></div>
+        <div class="col-md-6">
+          <div class="section-title">
+            <i class="fa fa-cloud"></i>
+            <p class="sk">{ui.balearicIslands}</p>
+            <h2>{ui.weather}</h2>
+          </div>
+          <Weather lang={lang} />
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>

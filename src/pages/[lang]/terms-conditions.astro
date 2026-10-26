@@ -1,0 +1,6 @@
+---
+import Static from '../../views/Static.astro';
+import { langStaticPaths } from '../../i18n';
+export const getStaticPaths = langStaticPaths;
+---
+<Static lang={Astro.params.lang!} k="terms" altPath="/terms-conditions/" />

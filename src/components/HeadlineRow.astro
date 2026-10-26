@@ -1,0 +1,23 @@
+---
+// Star FM "programme" card, used for the Top Stories band: picture with the day/month on top.
+import { catLabel, uiOf, fmt, localeOf } from '../i18n';
+import { postUrl, postLang, coverOf, readingTime, hasPhoto, type Post } from '../data/posts';
+interface Props { post: Post }
+const { post } = Astro.props;
+const lang = postLang(post);
+const ui = uiOf(lang);
+const loc = localeOf(lang).date;
+const d = post.data.date;
+const day = d.toLocaleDateString(loc, { day: 'numeric', timeZone: 'Europe/Madrid' });
+const mon = d.toLocaleDateString(loc, { month: 'short', timeZone: 'Europe/Madrid' }).replace('.', '').toUpperCase();
+---
+<li class="sf-show-info">
+  <a class:list={["sf-show-image", { nophoto: !hasPhoto(post) }]} href={postUrl(post)} tabindex="-1" aria-hidden="true">
+    <img loading="lazy" src={coverOf(post)} alt="" width="230" height="220" />
+    <div class="time"><div class="time-num">{day}</div><span>{mon}</span></div>
+  </a>
+  <div class="sf-show-text">
+    <h2><a href={postUrl(post)}>{post.data.title}</a></h2>
+    <h5><span class="cms-cat">{catLabel(lang, post.data.category)}</span>{fmt(ui.minRead, { n: readingTime(post) })}</h5>
+  </div>
+</li>

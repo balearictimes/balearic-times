@@ -1,0 +1,74 @@
+---
+// Weather widget (Open-Meteo, no key needed).
+// mode="select": one widget with an island picker. mode="grid": all four islands.
+import { ISLANDS } from '../data/site';
+import { uiOf, islandLabel, localeOf } from '../i18n';
+interface Props { mode?: 'select' | 'grid'; lang?: string }
+const { mode = 'select', lang = 'en' } = Astro.props;
+const ui = uiOf(lang);
+const i18n = JSON.stringify({ ...ui.wx, wind: ui.wxWind, unavailable: ui.wxUnavailable, locale: localeOf(lang).date });
+---
+{mode === 'select' ? (
+  <div class="svg-weather" data-wx="select" data-i18n={i18n}>
+    <label class="sr-only" for="wx-island">{ui.chooseIsland}</label>
+    <select id="wx-island" class="form-control">
+      {ISLANDS.map((i) => <option value={`${i.lat},${i.lon}`}>{i.place} ({islandLabel(lang, i.slug)})</option>)}
+    </select>
+    <div class="wx-box"><div class="sw-loading">{ui.wxLoading}</div></div>
+  </div>
+) : (
+  <div class="weather-grid">
+    {ISLANDS.map((i) => (
+      <div class="weather-card">
+        <h3>{islandLabel(lang, i.slug)}</h3>
+        <div class="svg-weather" data-wx="fixed" data-lat={i.lat} data-lon={i.lon} data-i18n={i18n}>
+          <div class="wx-box"><div class="sw-loading">{ui.wxLoading}</div></div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<script>
+  // WMO weather code -> [translation key, icon]
+  const WMO: Record<number, [string, string]> = {
+    0: ['clear', 'fa-sun-o'], 1: ['mainlyClear', 'fa-sun-o'], 2: ['partlyCloudy', 'fa-cloud'], 3: ['overcast', 'fa-cloud'],
+    45: ['fog', 'fa-align-justify'], 48: ['fog', 'fa-align-justify'],
+    51: ['drizzle', 'fa-umbrella'], 53: ['drizzle', 'fa-umbrella'], 55: ['drizzle', 'fa-umbrella'],
+    61: ['rain', 'fa-umbrella'], 63: ['rain', 'fa-umbrella'], 65: ['heavyRain', 'fa-umbrella'],
+    66: ['freezingRain', 'fa-umbrella'], 67: ['freezingRain', 'fa-umbrella'],
+    71: ['snow', 'fa-snowflake-o'], 73: ['snow', 'fa-snowflake-o'], 75: ['snow', 'fa-snowflake-o'], 77: ['snow', 'fa-snowflake-o'],
+    80: ['showers', 'fa-umbrella'], 81: ['showers', 'fa-umbrella'], 82: ['heavyRain', 'fa-umbrella'],
+    85: ['snow', 'fa-snowflake-o'], 86: ['snow', 'fa-snowflake-o'],
+    95: ['thunderstorm', 'fa-bolt'], 96: ['thunderstorm', 'fa-bolt'], 99: ['thunderstorm', 'fa-bolt'],
+  };
+  const info = (c: number) => WMO[c] ?? ['cloudy', 'fa-cloud'];
+
+  async function load(root: HTMLElement, lat: string, lon: string) {
+    const box = root.querySelector('.wx-box')!;
+    const T = JSON.parse(root.dataset.i18n || '{}');
+    const dname = (s: string) => new Date(s + 'T12:00').toLocaleDateString(T.locale || 'en-GB', { weekday: 'short' });
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=7&timezone=Europe%2FMadrid`;
+      const d = await (await fetch(url)).json();
+      const [key, icon] = info(d.current.weather_code);
+      const days = d.daily.time
+        .map((t: string, i: number) => {
+          const [, ic] = info(d.daily.weather_code[i]);
+          return `<div class="sw-day"><div class="sw-dname">${dname(t)}</div><i class="fa ${ic} sw-dicon"></i><span class="sw-hi">${Math.round(d.daily.temperature_2m_max[i])}°</span><span class="sw-lo">${Math.round(d.daily.temperature_2m_min[i])}°</span></div>`;
+        })
+        .join('');
+      box.innerHTML = `<div class="sw-current"><i class="fa ${icon} sw-cur-icon"></i><div><div class="sw-cur-temp">${Math.round(d.current.temperature_2m)}°C</div><div class="sw-cur-desc">${T[key]} · ${T.wind} ${Math.round(d.current.wind_speed_10m)} km/h</div></div></div><div class="sw-days">${days}</div>`;
+    } catch {
+      box.innerHTML = `<div class="sw-loading">${T.unavailable}</div>`;
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-wx="fixed"]').forEach((el) => load(el, el.dataset.lat!, el.dataset.lon!));
+  document.querySelectorAll<HTMLElement>('[data-wx="select"]').forEach((el) => {
+    const sel = el.querySelector('select') as HTMLSelectElement;
+    const go = () => { const [la, lo] = sel.value.split(','); load(el, la, lo); };
+    sel.addEventListener('change', go);
+    go();
+  });
+</script>

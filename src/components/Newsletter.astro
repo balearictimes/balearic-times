@@ -1,0 +1,25 @@
+---
+// Newsletter box (Star FM style). Uses Web3Forms: set PUBLIC_WEB3FORMS_KEY in Cloudflare Pages.
+import { uiOf, lp } from '../i18n';
+import { SITE } from '../data/site';
+interface Props { lang?: string }
+const { lang = 'en' } = Astro.props;
+const ui = uiOf(lang);
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+---
+<div class="newsletter-section">
+  <div class="section-title">
+    <i class="fa fa-envelope-square"></i>
+    <p class="sk">{ui.newsletter}</p>
+    <h2>{ui.signUp}</h2>
+  </div>
+  <form method="post" action="https://api.web3forms.com/submit">
+    <input type="hidden" name="access_key" value={key} />
+    <input type="hidden" name="subject" value="Newsletter signup — Balearic Times" />
+    <input type="hidden" name="redirect" value={`${SITE.url}${lp(lang, '/thank-you/')}`} />
+    <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" />
+    <div class="form-group"><label class="sr-only" for="nl-name">{ui.name}</label><input type="text" class="form-control" required id="nl-name" placeholder={ui.name} name="name" autocomplete="name" /></div>
+    <div class="form-group"><label class="sr-only" for="nl-email">{ui.email}</label><input type="email" class="form-control" required id="nl-email" placeholder={ui.email} name="email" autocomplete="email" /></div>
+    <div class="form-group" style="overflow:hidden"><button type="submit" class="btn btn-primary no-icon">{ui.subscribe}</button></div>
+  </form>
+</div>

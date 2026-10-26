@@ -1,0 +1,6 @@
+---
+import Article from '../views/Article.astro';
+import { articlePaths } from '../data/routes';
+export const getStaticPaths = () => articlePaths('en');
+---
+<Article {...Astro.props} />

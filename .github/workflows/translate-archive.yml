@@ -1,0 +1,56 @@
+name: Translate the archive
+
+# Translates the old articles (and anything still missing) into Spanish, French and German.
+# Run it by hand: GitHub → Actions → "Translate the archive" → Run workflow.
+# It also runs every night until everything is done, then it simply has nothing left to do.
+# On a free AI tier it stops by itself at the daily limit and carries on the next night.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max:
+        description: 'Most translations in this run'
+        default: '200'
+  schedule:
+    - cron: '40 2 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autopost
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Translate
+        env:
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_MODEL: ${{ vars.TRANSLATE_MODEL || vars.AI_MODEL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          TRANSLATE_MAX: ${{ github.event.inputs.max || vars.TRANSLATE_ARCHIVE_MAX || '200' }}
+        run: node scripts/translate.mjs
+      - name: Check the site still builds
+        run: npm run build
+      - name: Commit
+        run: |
+          git config user.name "Balearic Times Bot"
+          git config user.email "bot@balearictimes.com"
+          git add src/content/translations
+          if git diff --cached --quiet; then echo "Nothing new."; exit 0; fi
+          git commit -m "Translate archive $(date -u +'%Y-%m-%d')"
+          git pull --rebase
+          git push

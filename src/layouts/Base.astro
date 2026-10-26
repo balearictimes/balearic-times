@@ -1,0 +1,208 @@
+---
+import '../styles/global.css';
+import { SITE, CATEGORIES } from '../data/site';
+import { uiOf, catLabel, localeOf, LOCALES, lp, DEFAULT_LANG, fmt } from '../i18n';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  published?: Date;
+  modified?: Date;
+  jsonLd?: Record<string, unknown>;
+  /** Language of this page (en, es, fr, de). */
+  lang?: string;
+  /** The page's path without the language prefix, e.g. '/about-us/'. Needed for the language switcher and hreflang. */
+  altPath?: string;
+  /** Languages this page exists in (default: all). Articles only list the languages they are translated into. */
+  altLangs?: string[];
+}
+const { title, description, image, type = 'website', noindex = false, published, modified, jsonLd, lang = DEFAULT_LANG, altPath, altLangs } = Astro.props;
+const ui = uiOf(lang);
+const loc = localeOf(lang);
+const desc = description ?? ui.siteDescription;
+const NAV = [
+  { href: lp(lang, '/'), label: ui.home },
+  ...CATEGORIES.map((c) => ({ href: lp(lang, `/category/${c.slug}/`), label: catLabel(lang, c.slug) })),
+  { href: lp(lang, '/contact-us/'), label: ui.contact },
+  { href: lp(lang, '/about-us/'), label: ui.about },
+];
+const alternates = altPath ? LOCALES.filter((l) => !altLangs || altLangs.includes(l.code)) : [];
+const home = lp(lang, '/');
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${ui.defaultTitle}`;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImage = new URL(image && !image.endsWith('.svg') ? image : '/images/og-default.png', SITE.url).href;
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === home ? path === home : path.startsWith(href));
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsMediaOrganization',
+  name: SITE.name,
+  url: SITE.url,
+  logo: `${SITE.url}/images/og-default.png`,
+  email: SITE.email,
+  sameAs: Object.values(SITE.social).filter(Boolean),
+};
+const hasSocial = Object.values(SITE.social).some(Boolean);
+---
+<!doctype html>
+<html lang={loc.htmlLang} dir={loc.dir}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={desc} />
+  <link rel="canonical" href={canonical} />
+  <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
+  {alternates.map((l) => <link rel="alternate" hreflang={l.hreflang} href={new URL(lp(l.code, altPath!), SITE.url).href} />)}
+  {alternates.length > 0 && alternates.some((l) => l.code === DEFAULT_LANG) && <link rel="alternate" hreflang="x-default" href={new URL(altPath!, SITE.url).href} />}
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title={SITE.name} href={lp(lang, '/rss.xml')} />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:title" content={title ?? SITE.name} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:type" content={type} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:locale" content={loc.og} />
+  {alternates.filter((l) => l.code !== lang).map((l) => <meta property="og:locale:alternate" content={l.og} />)}
+  {published && <meta property="article:published_time" content={published.toISOString()} />}
+  {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preload" href="/fonts/aller-regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/aller-display.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/vendor/font-awesome/css/font-awesome.min.css" />
+  <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+</head>
+<body class={path === home ? 'sf-home' : ''}>
+  <div class="star-topbar">
+    <div class="container star-topbar-inner">
+      <span class="stb-tagline">{ui.tagline}</span>
+      <span class="stb-contact">
+        {alternates.length > 1 && (
+          <span class="lang-switch" aria-label={ui.language}>
+            <i class="fa fa-globe" aria-hidden="true"></i>
+            {alternates.map((l) => (
+              l.code === lang
+                ? <span class="lang-current" lang={l.htmlLang}>{l.code.toUpperCase()}</span>
+                : <a href={lp(l.code, altPath!)} hreflang={l.hreflang} lang={l.htmlLang} title={l.name}>{l.code.toUpperCase()}</a>
+            ))}
+          </span>
+        )}
+        {alternates.length > 1 && <span class="stb-sep">·</span>}
+        <a class="stb-hide-sm" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        <span class="stb-sep stb-hide-sm">·</span>
+        <a href={lp(lang, '/contact-us/')}>{ui.sendTipLower}</a>
+        <span class="stb-sep">·</span>
+        <span id="stbWeather">Palma</span>
+        <span class="stb-sep">·</span>
+        <span class="stb-clock" id="stbClock" data-locale={loc.date} data-tz={ui.timezone}>--:--</span>
+      </span>
+    </div>
+  </div>
+
+  <header id="sf-nav">
+    <div class="navbar">
+      <div class="container">
+        <a class="navbar-brand" href={home} aria-label={`${SITE.name} — ${ui.home}`}><img src="/logo.svg" alt={SITE.name} width="404" height="94" /></a>
+        <a href={lp(lang, SITE.cta.href)} class="btn btn-primary header-cta"><i class={`fa ${SITE.cta.icon}`}></i> {ui.sendTip}</a>
+        <button type="button" class="navbar-toggle" id="navToggle" aria-controls="mainNav" aria-expanded="false">
+          <span class="sr-only">{ui.toggleNav}</span>
+          <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+        </button>
+        <nav class="navbar-collapse" id="mainNav" aria-label="Main">
+          <ul class="nav navbar-nav">
+            {NAV.map((n) => <li class={isActive(n.href) ? 'active' : ''}><a href={n.href}>{n.label}</a></li>)}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  {hasSocial && (
+    <ul id="sf-social-rail">
+      {SITE.social.facebook && <li><a class="sr-fb" href={SITE.social.facebook} target="_blank" rel="noopener" title="Facebook"><i class="fa fa-facebook"></i></a></li>}
+      {SITE.social.instagram && <li><a class="sr-ig" href={SITE.social.instagram} target="_blank" rel="noopener" title="Instagram"><i class="fa fa-instagram"></i></a></li>}
+      {SITE.social.x && <li><a class="sr-x" href={SITE.social.x} target="_blank" rel="noopener" title="X"><i class="fa fa-twitter"></i></a></li>}
+    </ul>
+  )}
+
+  <div class="promotion contact section-padding">
+    <div class="promotion-content container">
+      <div class="row">
+        <div class="col-md-4">
+          <h3>{ui.usefulLinks}</h3>
+          <ul>
+            <li><a href={lp(lang, '/about-us/')}>{ui.aboutUs}</a></li>
+            <li><a href={lp(lang, '/category/news/')}>{ui.latestNews}</a></li>
+            <li><a href={lp(lang, '/category/weather/')}>{ui.weather}</a></li>
+            <li><a href={lp(lang, '/editorial-policy/')}>{ui.editorialPolicy}</a></li>
+            <li><a href={lp(lang, '/contact-us/')}>{ui.contactUs}</a></li>
+            <li><a href={lp(lang, '/rss.xml')}>{ui.rssFeed}</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <img class="img-responsive footer-logo" src="/images/logo-big.svg" alt={SITE.name} loading="lazy" width="560" height="315" />
+        </div>
+        <div class="col-md-4">
+          <h3>{ui.contactUs}</h3>
+          <ul class="contact-list">
+            <li><a href={`mailto:${SITE.email}`}><i class="fa fa-envelope"></i>{SITE.email}</a></li>
+            <li><a href={lp(lang, '/contact-us/')}><i class="fa fa-paper-plane"></i>{ui.sendNewsTip}</a></li>
+            {SITE.phone && <li><a href={`tel:${SITE.phone.replace(/\s/g, '')}`}><i class="fa fa-phone"></i>{SITE.phone}</a></li>}
+            {SITE.whatsapp && <li><a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noopener"><i class="fa fa-whatsapp"></i>WhatsApp</a></li>}
+            <li><a href={lp(lang, '/category/news/')}><i class="fa fa-map-marker"></i>{ui.location}</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="container">
+      <div class="copyright">
+        <p class="footer-links"><a href={lp(lang, '/about-us/')}>{ui.about}</a> <span>·</span> <a href={lp(lang, '/contact-us/')}>{ui.contact}</a> <span>·</span> <a href={lp(lang, '/privacy-policy/')}>{ui.privacyPolicy}</a> <span>·</span> <a href={lp(lang, '/terms-conditions/')}>{ui.terms}</a></p>
+        <p class="footer-credit">© {new Date().getFullYear()} {SITE.name}. {ui.weatherDataBy} <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a></p>
+      </div>
+      {hasSocial && (
+        <div class="footer-memu">
+          <ul>
+            {SITE.social.facebook && <li><a href={SITE.social.facebook} target="_blank" rel="noopener" title="Facebook"><i class="fa fa-facebook"></i></a></li>}
+            {SITE.social.instagram && <li><a href={SITE.social.instagram} target="_blank" rel="noopener" title="Instagram"><i class="fa fa-instagram"></i></a></li>}
+            {SITE.social.x && <li><a href={SITE.social.x} target="_blank" rel="noopener" title="X"><i class="fa fa-twitter"></i></a></li>}
+          </ul>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const menu = document.getElementById('mainNav');
+    toggle?.addEventListener('click', () => {
+      const open = menu?.classList.toggle('in');
+      toggle.setAttribute('aria-expanded', String(!!open));
+    });
+    const clock = document.getElementById('stbClock');
+    const tick = () => {
+      if (clock) clock.textContent = new Date().toLocaleTimeString(clock.dataset.locale || 'en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' }) + ' ' + (clock.dataset.tz || 'CET');
+    };
+    tick();
+    setInterval(tick, 15000);
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=39.5696&longitude=2.6502&current=temperature_2m&timezone=Europe%2FMadrid')
+      .then((r) => r.json())
+      .then((d) => {
+        const el = document.getElementById('stbWeather');
+        if (el && d?.current) el.textContent = `Palma ${Math.round(d.current.temperature_2m)}°C`;
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

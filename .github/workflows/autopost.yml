@@ -1,0 +1,59 @@
+name: Autopost
+
+on:
+  schedule:
+    # 06:20, 11:20 and 17:20 UTC (about 07:20, 12:20 and 18:20 in the Balearics in winter)
+    - cron: '20 6,11,17 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autopost
+  cancel-in-progress: false
+
+jobs:
+  autopost:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Write new stories
+        env:
+          AUTOPUBLISH: ${{ vars.AUTOPUBLISH }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node scripts/autopost.mjs
+      - name: Translate new and changed stories (Spanish, French, German)
+        # Never stops the run: if the AI is out of quota, the next run carries on.
+        continue-on-error: true
+        env:
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_MODEL: ${{ vars.TRANSLATE_MODEL || vars.AI_MODEL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          TRANSLATE_MAX: ${{ vars.TRANSLATE_MAX || '40' }}
+        run: node scripts/translate.mjs
+      - name: Check the site still builds
+        run: npm run build
+      - name: Commit (one commit per run = one Cloudflare build)
+        run: |
+          git config user.name "Balearic Times Bot"
+          git config user.email "bot@balearictimes.com"
+          git add src/content/posts src/content/translations data
+          if git diff --cached --quiet; then echo "Nothing new."; exit 0; fi
+          git commit -m "Autopost $(date -u +'%Y-%m-%d %H:%M')"
+          git push

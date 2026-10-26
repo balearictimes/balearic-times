@@ -1,0 +1,6 @@
+---
+import Home from '../../views/Home.astro';
+import { langStaticPaths } from '../../i18n';
+export const getStaticPaths = langStaticPaths;
+---
+<Home lang={Astro.params.lang!} />

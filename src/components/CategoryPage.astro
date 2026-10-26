@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import PageBanner from './PageBanner.astro';
+import NewsCard from './NewsCard.astro';
+import Weather from './Weather.astro';
+import { CATEGORIES } from '../data/site';
+import { uiOf, catLabel, catBlurb, fmt, lp, DEFAULT_LANG } from '../i18n';
+import type { Post } from '../data/posts';
+
+interface Props { cat: string; items: Post[]; page: number; pages: number; lang?: string }
+const { cat, items, page, pages, lang = DEFAULT_LANG } = Astro.props;
+const ui = uiOf(lang);
+const name = catLabel(lang, cat);
+const base = `/category/${cat}/`;
+const href = (n: number) => lp(lang, n === 1 ? base : `${base}page/${n}/`);
+const nums = Array.from({ length: pages }, (_, i) => i + 1).filter((n) => n === 1 || n === pages || Math.abs(n - page) <= 2);
+// A translated section with nothing in it yet is not worth indexing
+const empty = items.length === 0;
+---
+<Base
+  title={page > 1 ? fmt(ui.catPageTitle, { name, n: page }) : fmt(ui.catTitle, { name })}
+  description={catBlurb(lang, cat)}
+  lang={lang}
+  altPath={page === 1 ? base : undefined}
+  noindex={empty}
+>
+  <PageBanner title={name} />
+
+  <div class="sf-news-section section-padding bg-white">
+    <div class="container">
+      <div class="page-intro">
+        <h2>{fmt(ui.catIntro, { name })}</h2>
+        <p>{catBlurb(lang, cat)}</p>
+      </div>
+
+      <div class="news-tabs">
+        {CATEGORIES.map((c) => <a href={lp(lang, `/category/${c.slug}/`)} class={c.slug === cat ? 'active' : ''}>{catLabel(lang, c.slug)}</a>)}
+      </div>
+
+      {cat === 'weather' && page === 1 && <div style="margin-bottom:40px"><Weather mode="grid" lang={lang} /></div>}
+
+      {items.length ? <div class="cms-grid">{items.map((p) => <NewsCard post={p} />)}</div> : (
+        <p class="empty-note">{ui.noStories} {lang !== DEFAULT_LANG && <a href={base}>{ui.readInEnglish}</a>}</p>
+      )}
+
+      {pages > 1 && (
+        <nav class="pagination" aria-label={ui.pagination}>
+          {page > 1 ? <a href={href(page - 1)}>«</a> : <span class="disabled">«</span>}
+          {nums.map((n, i) => (
+            <>
+              {i > 0 && n - nums[i - 1] > 1 && <span class="disabled">…</span>}
+              {n === page ? <span class="active">{n}</span> : <a href={href(n)}>{n}</a>}
+            </>
+          ))}
+          {page < pages ? <a href={href(page + 1)}>»</a> : <span class="disabled">»</span>}
+        </nav>
+      )}
+    </div>
+  </div>
+</Base>

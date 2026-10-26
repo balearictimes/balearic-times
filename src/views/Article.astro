@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+import PageBanner from '../components/PageBanner.astro';
+import NewsCard from '../components/NewsCard.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { render } from 'astro:content';
+import { SITE } from '../data/site';
+import { formatDate, excerptOf, readingTime, hasPhoto, postUrl, type LPost } from '../data/posts';
+import { uiOf, catLabel, fmt, lp, DEFAULT_LANG } from '../i18n';
+
+interface Props { post: LPost; related: LPost[]; altLangs: string[] }
+const { post, related, altLangs } = Astro.props;
+const lang = post.lang;
+const ui = uiOf(lang);
+const { Content } = await render(post.entry as any);
+const d = post.data;
+const url = new URL(postUrl(post), SITE.url).href;
+const description = excerptOf(post, 155);
+const cat = catLabel(lang, d.category);
+const catHref = lp(lang, `/category/${d.category}/`);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: d.title,
+  description,
+  inLanguage: lang,
+  datePublished: d.date.toISOString(),
+  dateModified: (d.updated ?? d.date).toISOString(),
+  image: hasPhoto(post) ? [new URL(d.image!, SITE.url).href] : [`${SITE.url}/images/og-default.png`],
+  author: [{ '@type': /newsroom|desk/i.test(d.author) ? 'Organization' : 'Person', name: d.author }],
+  publisher: { '@type': 'NewsMediaOrganization', name: SITE.name, logo: { '@type': 'ImageObject', url: `${SITE.url}/images/og-default.png` } },
+  mainEntityOfPage: url,
+  articleSection: cat,
+  isBasedOn: d.sourceUrl || undefined,
+  translationOfWork: lang !== DEFAULT_LANG ? new URL(`/${post.id}/`, SITE.url).href : undefined,
+};
+const enc = encodeURIComponent;
+---
+<Base title={d.title} description={description} image={d.image} type="article" noindex={d.noindex} published={d.date} modified={d.updated} jsonLd={jsonLd} lang={lang} altPath={`/${post.id}/`} altLangs={altLangs}>
+  <PageBanner title={cat} asH1={false} image={hasPhoto(post) ? d.image : SITE.heroImage} />
+
+  <div class="section-padding bg-white">
+    <article class="container cms-article">
+      <a class="cms-back" href={catHref}>{fmt(ui.backTo, { cat })}</a>
+      <div>
+        <a class="cms-cat" href={catHref}>{cat}</a><span class="cms-byline">{fmt(ui.by, { author: d.author })}</span><span class="cms-card-date" style="display:inline">{fmt(ui.minRead, { n: readingTime(post) })}</span>
+      </div>
+      <time class="cms-card-date" datetime={d.date.toISOString()}>{formatDate(d.date, lang)}{d.updated && ` · ${fmt(ui.updated, { date: formatDate(d.updated, lang) })}`}</time>
+      <h1 class="cms-article-title">{d.title}</h1>
+      {d.excerpt && <p class="cms-article-lede">{d.excerpt}</p>}
+      {lang !== DEFAULT_LANG && (
+        <p class="lang-notice">{ui.translatedNote} <a href={`/${post.id}/`} hreflang="en">{ui.readOriginal}</a></p>
+      )}
+      {hasPhoto(post) && (
+        <figure class="cms-article-figure">
+          <img class="cms-article-img" src={d.image} alt={d.imageAlt ?? d.title} width="1200" height="675" />
+          {d.imageCredit && <figcaption>{fmt(ui.photo, { credit: d.imageCredit })}</figcaption>}
+        </figure>
+      )}
+      <div class="cms-article-body"><Content /></div>
+
+      {d.sourceUrl && (
+        <div class="source-box">
+          <strong>{ui.source}</strong> {ui.basedOn} <a href={d.sourceUrl} target="_blank" rel="noopener nofollow">{d.sourceName ?? new URL(d.sourceUrl).hostname}</a>.
+        </div>
+      )}
+
+      <div class="share-row">
+        <span>{ui.share}</span>
+        <a href={`https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`} target="_blank" rel="noopener"><i class="fa fa-facebook"></i> Facebook</a>
+        <a href={`https://wa.me/?text=${enc(d.title + ' ' + url)}`} target="_blank" rel="noopener"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+        <a href={`https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(d.title)}`} target="_blank" rel="noopener"><i class="fa fa-twitter"></i> X</a>
+        <a href={`mailto:?subject=${enc(d.title)}&body=${enc(url)}`}><i class="fa fa-envelope"></i> Email</a>
+      </div>
+
+      <AdSlot slot="" variant="inarticle" lang={lang} />
+    </article>
+
+    {related.length > 0 && (
+      <div class="container sf-news-section" style="padding-top:30px">
+        <div class="section-title" style="margin-bottom:30px">
+          <p class="sk">{ui.keepReading}</p>
+          <h2>{fmt(ui.moreCat, { cat })}</h2>
+        </div>
+        <div class="cms-grid">{related.map((p) => <NewsCard post={p} />)}</div>
+      </div>
+    )}
+  </div>
+</Base>

@@ -1,0 +1,22 @@
+{
+  "name": "balearic-times",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "autopost": "node scripts/autopost.mjs",
+    "weather": "node scripts/autopost.mjs --weather-only"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@mozilla/readability": "^0.6.0",
+    "astro": "^7.4.2",
+    "fast-xml-parser": "^5.11.2",
+    "linkedom": "^0.18.14",
+    "turndown": "^7.2.4"
+  }
+}

@@ -1,0 +1,33 @@
+---
+// About, Editorial, Privacy, Terms, Contact, Thank-you and 404 — text lives in src/i18n/lang/<lang>.ts
+import Page from '../layouts/Page.astro';
+import { SITE } from '../data/site';
+import { uiOf, pagesOf, pageHtml, lp } from '../i18n';
+
+interface Props { lang: string; k: 'about' | 'editorial' | 'privacy' | 'terms' | 'contact' | 'thanks' | 'notFound'; altPath?: string; noindex?: boolean }
+const { lang, k, altPath, noindex } = Astro.props;
+const ui = uiOf(lang);
+const p: any = pagesOf(lang)[k];
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+const redirect = `${SITE.url}${lp(lang, '/thank-you/')}`;
+---
+<Page title={p.title} intro={p.intro} description={p.description} lang={lang} altPath={altPath} noindex={noindex}>
+  <Fragment set:html={pageHtml(lang, p.html)} />
+  {k === 'contact' && (
+    <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value={key} />
+      <input type="hidden" name="subject" value={`New message from ${new URL(SITE.url).hostname}`} />
+      <input type="hidden" name="redirect" value={redirect} />
+      <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" />
+      <label>{ui.yourName}<input class="form-control" name="name" required autocomplete="name" /></label>
+      <label>{ui.email}<input class="form-control" type="email" name="email" required autocomplete="email" /></label>
+      <label>{ui.topic}
+        <select class="form-control" name="topic">
+          {ui.topics.map((t) => <option>{t}</option>)}
+        </select>
+      </label>
+      <label>{ui.message}<textarea class="form-control" name="message" required></textarea></label>
+      <div><button class="btn btn-primary no-icon" type="submit">{ui.sendMessage}</button></div>
+    </form>
+  )}
+</Page>

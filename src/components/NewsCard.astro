@@ -1,0 +1,20 @@
+---
+import { catLabel, uiOf, lp } from '../i18n';
+import { postUrl, postLang, formatDate, excerptOf, coverOf, type Post } from '../data/posts';
+interface Props { post: Post }
+const { post } = Astro.props;
+const url = postUrl(post);
+const lang = postLang(post);
+const ui = uiOf(lang);
+---
+<div class="cms-card-post">
+  <a class="cms-card-img" href={url} tabindex="-1" aria-hidden="true">
+    <img loading="lazy" src={coverOf(post)} alt={post.data.imageAlt ?? post.data.title} width="640" height="360" />
+  </a>
+  <div class="cms-card-body">
+    <div><a class="cms-cat" href={lp(lang, `/category/${post.data.category}/`)}>{catLabel(lang, post.data.category)}</a><span class="cms-card-date">{formatDate(post.data.date, lang)}</span></div>
+    <h3><a href={url}>{post.data.title}</a></h3>
+    <p>{excerptOf(post, 150)}</p>
+    <a class="btn btn-primary no-icon" href={url}>{ui.readMore}</a>
+  </div>
+</div>

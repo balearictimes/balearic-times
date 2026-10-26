@@ -1,0 +1,130 @@
+# Balearic Times editor (Sveltia CMS) – open https://balearictimes.com/admin/
+# 1. Change `repo` below to your GitHub username/repo.
+# 2. Sign in with a GitHub personal access token (simplest), or set up GitHub OAuth
+#    with the free "sveltia-cms-auth" Cloudflare Worker and add its URL as base_url.
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/balearic-times
+  branch: main
+  # base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev
+
+site_url: https://balearictimes.com
+display_url: https://balearictimes.com
+logo_url: /favicon.svg
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: posts
+    label: Articles
+    label_singular: Article
+    folder: src/content/posts
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    sortable_fields: [date, title, category]
+    view_filters:
+      - { label: Drafts (waiting for review), field: draft, pattern: true }
+      - { label: Published, field: draft, pattern: false }
+      - { label: Autoposted, field: autopost, pattern: true }
+    view_groups:
+      - { label: Category, field: category }
+    summary: '{{title}} – {{category}} – {{date | date("DD MMM YYYY")}}{{draft | ternary(" – DRAFT", "")}}'
+    fields:
+      - { name: title, label: Headline, widget: string }
+      - name: category
+        label: Category
+        widget: select
+        options:
+          - { label: News, value: news }
+          - { label: Business, value: business }
+          - { label: Economy, value: economy }
+          - { label: Health, value: health }
+          - { label: Lifestyle, value: lifestyle }
+          - { label: Politics, value: politics }
+          - { label: Culture, value: culture }
+          - { label: Sports, value: sports }
+          - { label: Tech, value: tech }
+          - { label: Weather, value: weather }
+      - { name: date, label: Publish date, widget: datetime }
+      - { name: excerpt, label: Summary (shown under the headline and in Google), widget: text, required: false }
+      - { name: image, label: Main image, widget: image, required: false }
+      - { name: imageAlt, label: Image description (for accessibility), widget: string, required: false }
+      - { name: imageCredit, label: Photo credit, widget: string, required: false }
+      - { name: author, label: Author, widget: string, default: Balearic Times Newsroom }
+      - { name: body, label: Article, widget: markdown }
+      - { name: sourceName, label: Source name, widget: string, required: false }
+      - { name: sourceUrl, label: Source link, widget: string, required: false }
+      - { name: featured, label: Feature on homepage, widget: boolean, default: false }
+      - { name: draft, label: Draft (untick to publish), widget: boolean, default: false }
+      - { name: noindex, label: Hide from Google, widget: boolean, default: false }
+      - { name: autopost, label: Written by the autoposter, widget: boolean, default: false }
+      - { name: updated, label: Last updated, widget: datetime, required: false }
+
+  - name: translations_es
+    label: Translations — Spanish
+    label_singular: Spanish translation
+    folder: src/content/translations/es
+    create: false
+    delete: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    sortable_fields: [title]
+    view_filters:
+      - { label: Corrected by a human, field: reviewed, pattern: true }
+      - { label: Machine translated, field: reviewed, pattern: false }
+    summary: '{{title}}{{reviewed | ternary(" – ✓ reviewed", "")}}'
+    fields:
+      - { name: title, label: Headline, widget: string }
+      - { name: excerpt, label: Summary, widget: text, required: false }
+      - { name: body, label: Article, widget: markdown }
+      - { name: reviewed, label: "I corrected this by hand (the robot will never overwrite it)", widget: boolean, default: true }
+      - { name: draft, label: Hide this translation, widget: boolean, default: false }
+      - { name: sourceHash, label: Fingerprint of the English text (leave alone), widget: string, required: false }
+
+  - name: translations_fr
+    label: Translations — French
+    label_singular: French translation
+    folder: src/content/translations/fr
+    create: false
+    delete: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    sortable_fields: [title]
+    view_filters:
+      - { label: Corrected by a human, field: reviewed, pattern: true }
+      - { label: Machine translated, field: reviewed, pattern: false }
+    summary: '{{title}}{{reviewed | ternary(" – ✓ reviewed", "")}}'
+    fields:
+      - { name: title, label: Headline, widget: string }
+      - { name: excerpt, label: Summary, widget: text, required: false }
+      - { name: body, label: Article, widget: markdown }
+      - { name: reviewed, label: "I corrected this by hand (the robot will never overwrite it)", widget: boolean, default: true }
+      - { name: draft, label: Hide this translation, widget: boolean, default: false }
+      - { name: sourceHash, label: Fingerprint of the English text (leave alone), widget: string, required: false }
+
+  - name: translations_de
+    label: Translations — German
+    label_singular: German translation
+    folder: src/content/translations/de
+    create: false
+    delete: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    sortable_fields: [title]
+    view_filters:
+      - { label: Corrected by a human, field: reviewed, pattern: true }
+      - { label: Machine translated, field: reviewed, pattern: false }
+    summary: '{{title}}{{reviewed | ternary(" – ✓ reviewed", "")}}'
+    fields:
+      - { name: title, label: Headline, widget: string }
+      - { name: excerpt, label: Summary, widget: text, required: false }
+      - { name: body, label: Article, widget: markdown }
+      - { name: reviewed, label: "I corrected this by hand (the robot will never overwrite it)", widget: boolean, default: true }
+      - { name: draft, label: Hide this translation, widget: boolean, default: false }
+      - { name: sourceHash, label: Fingerprint of the English text (leave alone), widget: string, required: false }

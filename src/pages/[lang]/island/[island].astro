@@ -1,0 +1,7 @@
+---
+import Island from '../../../views/Island.astro';
+import { islandPaths } from '../../../data/routes';
+import { OTHER_LANGS } from '../../../i18n';
+export const getStaticPaths = () => OTHER_LANGS.flatMap((l) => islandPaths(l.code));
+---
+<Island lang={Astro.params.lang!} island={Astro.params.island!} />

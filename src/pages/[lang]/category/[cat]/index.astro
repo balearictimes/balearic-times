@@ -1,0 +1,11 @@
+---
+import CategoryPage from '../../../../components/CategoryPage.astro';
+import { categoryPaths } from '../../../../data/routes';
+import { OTHER_LANGS } from '../../../../i18n';
+export async function getStaticPaths() {
+  return (await Promise.all(OTHER_LANGS.map((l) => categoryPaths(l.code, false)))).flat();
+}
+const { cat, lang } = Astro.params;
+const { items, pages } = Astro.props;
+---
+<CategoryPage cat={cat!} items={items} page={1} pages={pages} lang={lang} />

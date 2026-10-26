@@ -1,0 +1,14 @@
+---
+// Inner-page banner: photo + dark overlay, letter-spaced kicker and big uppercase title.
+// asH1=false when the page has its own <h1> (articles), so there is only one h1 per page.
+import { SITE } from '../data/site';
+interface Props { title: string; kicker?: string; asH1?: boolean; image?: string }
+const { title, kicker = SITE.name, asH1 = true, image = SITE.heroImage } = Astro.props;
+---
+<div class="breadcrumb bg-image" style={`background-image:url('${image}')`}>
+  <div class="overlay"></div>
+  <div class="page-title">
+    <p class="page-kicker">{kicker}</p>
+    {asH1 ? <h1>{title}</h1> : <p class="pt-name">{title}</p>}
+  </div>
+</div>
