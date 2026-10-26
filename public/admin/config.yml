@@ -4,7 +4,7 @@
 #    with the free "sveltia-cms-auth" Cloudflare Worker and add its URL as base_url.
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/balearic-times
+  repo: balearictimes/balearic-times
   branch: main
   # base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev
 
