@@ -82,17 +82,19 @@ const hasSocial = Object.values(SITE.social).some(Boolean);
     <div class="container star-topbar-inner">
       <span class="stb-tagline">{ui.tagline}</span>
       <span class="stb-contact">
-        {alternates.length > 1 && (
+        {altPath && (
           <span class="lang-switch" aria-label={ui.language}>
             <i class="fa fa-globe" aria-hidden="true"></i>
-            {alternates.map((l) => (
+            {LOCALES.map((l) => (
               l.code === lang
                 ? <span class="lang-current" lang={l.htmlLang}>{l.code.toUpperCase()}</span>
-                : <a href={lp(l.code, altPath!)} hreflang={l.hreflang} lang={l.htmlLang} title={l.name}>{l.code.toUpperCase()}</a>
+                : (!altLangs || altLangs.includes(l.code))
+                  ? <a href={lp(l.code, altPath)} hreflang={l.hreflang} lang={l.htmlLang} title={l.name}>{l.code.toUpperCase()}</a>
+                  : <span class="lang-missing" lang={l.htmlLang} title={`${l.name}: ${ui.notTranslated}`}>{l.code.toUpperCase()}</span>
             ))}
           </span>
         )}
-        {alternates.length > 1 && <span class="stb-sep">·</span>}
+        {altPath && <span class="stb-sep">·</span>}
         <a class="stb-hide-sm" href={`mailto:${SITE.email}`}>{SITE.email}</a>
         <span class="stb-sep stb-hide-sm">·</span>
         <a href={lp(lang, '/contact-us/')}>{ui.sendTipLower}</a>

@@ -13,6 +13,7 @@ export const ui = {
   sendTip: 'Send a Tip',
   sendTipLower: 'Send a tip',
   language: 'Language',
+  notTranslated: 'Not translated yet',
   toggleNav: 'Toggle navigation',
   timezone: 'CET',
 

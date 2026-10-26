@@ -11,6 +11,7 @@ export const ui: typeof UI = {
   sendTip: 'Envoyer une info',
   sendTipLower: 'Envoyer une info',
   language: 'Langue',
+  notTranslated: 'Pas encore traduit',
   toggleNav: 'Ouvrir le menu',
   timezone: 'CET',
 

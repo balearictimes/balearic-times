@@ -348,3 +348,4 @@ textarea.form-control { height: auto; min-height: 160px; }
 .lang-switch a, .lang-switch .lang-current { font-size: 12px; letter-spacing: .5px; }
 .lang-switch .lang-current { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .lang-notice { background: #f4f4f4; border-left: 4px solid var(--accent); padding: 10px 14px; margin: 0 0 18px; font-size: 14px; }
+.lang-switch .lang-missing { opacity: .4; cursor: help; text-decoration: line-through; font-size: 12px; letter-spacing: .5px; }
