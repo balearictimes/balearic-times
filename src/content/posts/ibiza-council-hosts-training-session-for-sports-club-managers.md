@@ -1,16 +1,19 @@
 ---
-title: "Ibiza Council hosts training session for sports club managers"
-date: 2026-10-26T23:55:18.363Z
+title: Ibiza Council hosts training session for sports club managers
 category: sports
-excerpt: "The Consell d'Eivissa's sports department is organising a free workshop on 30 October to help local clubs improve their administrative and legal management."
-image: "/images/cat-sports.svg"
-imageAlt: "Balearic Times sports"
-author: "Balearic Times Newsroom"
-sourceName: "Consell d'Eivissa – news"
-sourceUrl: "https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1220413/maximized"
-draft: true
+date: 2026-10-26T23:55:18.363Z
+excerpt: The Consell d'Eivissa's sports department is organising a free workshop on 30 October to help local clubs improve their administrative and legal management.
+image: /images/cat-sports.svg
+imageAlt: Balearic Times sports
+imageCredit: ''
+author: Balearic Times Newsroom
+sourceName: Consell d'Eivissa – news
+sourceUrl: https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1220413/maximized
+featured: false
+draft: false
 noindex: false
 autopost: true
+updated: ''
 ---
 
 ## Free workshop for club administrators
