@@ -10,7 +10,7 @@ author: Balearic Times Newsroom
 sourceName: Consell d'Eivissa – news
 sourceUrl: https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1218677/maximized
 featured: false
-draft: true
+draft: false
 noindex: false
 autopost: true
 updated: 2026-10-27T01:29:00
