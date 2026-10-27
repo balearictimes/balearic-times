@@ -1,16 +1,19 @@
 ---
-title: "Ibiza Council boosts winter bus services by nearly 50 per cent"
-date: 2026-10-26T23:55:31.166Z
+title: Ibiza Council boosts winter bus services by nearly 50 per cent
 category: news
-excerpt: "The Consell d'Eivissa will run 28,267 monthly bus trips this winter, adding 9,290 more than last year across inter-municipal and urban routes."
-image: "/images/cat-news.svg"
-imageAlt: "Balearic Times news"
-author: "Balearic Times Newsroom"
-sourceName: "Consell d'Eivissa – news"
-sourceUrl: "https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1218677/maximized"
+date: 2026-10-26T23:55:31.166Z
+excerpt: The Consell d'Eivissa will run 28,267 monthly bus trips this winter, adding 9,290 more than last year across inter-municipal and urban routes.
+image: /images/cat-news.svg
+imageAlt: Balearic Times news
+imageCredit: ''
+author: Balearic Times Newsroom
+sourceName: Consell d'Eivissa – news
+sourceUrl: https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1218677/maximized
+featured: false
 draft: true
 noindex: false
 autopost: true
+updated: 2026-10-27T01:29:00
 ---
 
 The Consell d'Eivissa (Ibiza Island Council) is finalising winter timetables for the island's new public transport contract that will deliver a 48.96 per cent increase in monthly bus trips compared with November 2025. The expanded schedule takes effect during the first winter season under the contract launched last April.
