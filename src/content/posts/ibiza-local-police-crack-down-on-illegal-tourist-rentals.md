@@ -8,7 +8,7 @@ imageAlt: "Balearic Times news"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament d'Eivissa – news"
 sourceUrl: "https://www.eivissa.es/w/el-quart-torn-de-la-policia-local-d-eivissa-aixeca-quatre-noves-actes-per-lloguer-tur%C3%ADstic-il%C2%B7legal-i-refor%C3%A7a-el-balan%C3%A7-d-actuacions-contra-l-intrusisme-durant-la-temporada"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---

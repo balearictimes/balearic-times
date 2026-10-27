@@ -8,7 +8,7 @@ imageAlt: "Balearic Times sports"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament de Sant Antoni de Portmany – news"
 sourceUrl: "https://www.santantoni.net/-/l-ajuntament-inicia-la-reforma-integral-de-les-graderies-del-camp-de-futbol-municipal-de-sant-antoni"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---

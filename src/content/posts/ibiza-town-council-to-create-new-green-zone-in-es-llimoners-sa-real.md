@@ -8,7 +8,7 @@ imageAlt: "Balearic Times news"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament d'Eivissa – news"
 sourceUrl: "https://www.eivissa.es/w/l-ajuntament-d-eivissa-compleix-el-seu-comprom%C3%ADs-amb-els-ve%C3%AFns-d-es-llimoners-sa-real-i-impulsa-la-creaci%C3%B3-d-una-nova-zona-verda-de-3.273-m%C2%B2"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---

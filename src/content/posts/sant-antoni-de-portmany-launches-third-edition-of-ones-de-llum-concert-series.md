@@ -8,7 +8,7 @@ imageAlt: "Balearic Times culture"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament de Sant Antoni de Portmany – news"
 sourceUrl: "https://www.santantoni.net/-/l-ajuntament-de-sant-antoni-presenta-la-tercera-edicio-d-ones-de-llum-el-cicle-de-concerts-que-uneix-musica-i-video-mapping"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---

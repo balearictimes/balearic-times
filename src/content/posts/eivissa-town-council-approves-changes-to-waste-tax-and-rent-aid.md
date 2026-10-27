@@ -8,7 +8,7 @@ imageAlt: "Balearic Times news"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament d'Eivissa – news"
 sourceUrl: "https://www.eivissa.es/w/el-ple-de-l-ajuntament-d-eivissa-aborda-modificacions-en-la-taxa-de-residus-les-ajudes-al-lloguer-i-actuacions-en-mat%C3%A8ria-d-urbanisme-i-mobilitat"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---

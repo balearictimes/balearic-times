@@ -8,7 +8,7 @@ imageAlt: "Balearic Times lifestyle"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament de Sant Antoni de Portmany – news"
 sourceUrl: "https://www.santantoni.net/-/sant-antoni-de-portmany-acull-diferents-activitats-per-celebrar-halloween-i-tots-sants"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---

@@ -8,7 +8,7 @@ imageAlt: "Balearic Times news"
 author: "Balearic Times Newsroom"
 sourceName: "Ajuntament de Sant Antoni de Portmany – news"
 sourceUrl: "https://www.santantoni.net/-/sant-antoni-reforca-la-preparacio-i-coordinacio-dels-seus-serveis-municipals-amb-la-implantacio-del-pemu-i-el-pamin"
-draft: false
+draft: true
 noindex: false
 autopost: true
 ---
