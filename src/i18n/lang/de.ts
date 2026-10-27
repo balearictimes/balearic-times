@@ -107,6 +107,8 @@ export const ui: typeof UI = {
   privacyPolicy: 'Datenschutz',
   terms: 'Nutzungsbedingungen',
   weatherDataBy: 'Wetterdaten von',
+  licensedUnder: 'Die verwendeten Informationen stehen unter {licence}; dieser Artikel wird unter derselben Lizenz geteilt.',
+  poweredBy: 'betrieben von',
 
   yourName: 'Ihr Name',
   topic: 'Thema',
@@ -140,7 +142,7 @@ export const pages: typeof PAGES = {
 <h2>Übersetzungen</h2>
 <p>Unsere Artikel werden auf Englisch geschrieben und ins Spanische, Französische und Deutsche übersetzt, meist mit Hilfe von KI-Übersetzung. Jede Übersetzung verweist auf das englische Original, das bei Abweichungen maßgeblich ist. Wenn Sie in einer Übersetzung einen Fehler entdecken, sagen Sie es uns bitte.</p>
 <h2>Automatisierung und KI</h2>
-<p>Einige Routinemeldungen, etwa die tägliche Wettervorhersage und Zusammenfassungen offizieller Mitteilungen, entstehen mit Hilfe von Software und KI-Schreibwerkzeugen. Diese Entwürfe werden vor der Veröffentlichung mit der Originalquelle abgeglichen. Automatische Wetterberichte beruhen auf den offenen Vorhersagedaten von Open-Meteo.</p>
+<p>Einige Routinemeldungen, etwa die tägliche Wettervorhersage und Zusammenfassungen offizieller Mitteilungen, entstehen mit Hilfe von Software und KI-Schreibwerkzeugen. Diese Entwürfe werden vor der Veröffentlichung mit der Originalquelle abgeglichen. Automatische Wetterberichte beruhen auf den offenen Vorhersagedaten von Open-Meteo. Beruht ein Beitrag auf Informationen unter einer Creative-Commons-Lizenz (zum Beispiel vom Govern de les Illes Balears, CC BY-SA), weisen wir unter dem Artikel darauf hin und teilen unsere Neufassung unter derselben Lizenz.</p>
 <h2>Bilder</h2>
 <p>Wir verwenden eigene Fotos, zur Veröffentlichung bereitgestellte Bilder und offen lizenzierte Bilder mit Quellenangabe. Bilder anderer Medien kopieren wir nicht.</p>
 <h2>Korrekturen</h2>

@@ -115,6 +115,8 @@ export const ui = {
   privacyPolicy: 'Privacy Policy',
   terms: 'Terms & Conditions',
   weatherDataBy: 'Weather data by',
+  licensedUnder: 'The information used is licensed under {licence}; this article is shared under the same licence.',
+  poweredBy: 'powered by',
 
   // Contact form
   yourName: 'Your name',
@@ -149,7 +151,7 @@ export const pages = {
 <h2>Translations</h2>
 <p>Our articles are written in English and translated into Spanish, French and German, mostly with the help of AI translation. Each translation links to the English original, which is the reference version if there is any difference. If you spot a translation error, please tell us.</p>
 <h2>Use of automation and AI</h2>
-<p>Some routine stories, such as daily weather forecasts and summaries of official announcements, are drafted with the help of software and AI writing tools. Those drafts are checked by an editor against the original source before they are published. Automated weather reports are generated from open forecast data provided by Open-Meteo.</p>
+<p>Some routine stories, such as daily weather forecasts and summaries of official announcements, are drafted with the help of software and AI writing tools. Those drafts are checked by an editor against the original source before they are published. Automated weather reports are generated from open forecast data provided by Open-Meteo. Where a story is based on information published under a Creative Commons licence (for example by the Govern de les Illes Balears, CC BY-SA), we say so under the article and share our rewrite under the same licence.</p>
 <h2>Images</h2>
 <p>We use our own photographs, images supplied for publication by the organisations involved, and openly licensed images, and we credit them. We do not copy photographs from other publications.</p>
 <h2>Corrections</h2>

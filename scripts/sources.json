@@ -1,14 +1,14 @@
 {
   "_readme": [
-    "Only add sources whose content is published FOR reuse: official press rooms (Govern, Consells, Ajuntaments, ports, universities),",
-    "public bodies, statistics offices, clubs' and companies' own press releases. Check each site's 'Aviso legal'.",
-    "Do NOT add other newspapers (Diario de Mallorca, Ultima Hora, Majorca Daily Bulletin, Mallorca Zeitung, etc.).",
+    "Only add sources whose content is published FOR reuse, or whose legal notice does not forbid it: open licences (Creative Commons), statistics offices and public bodies. Read each site's 'Aviso legal' first.",
+    "Do NOT add other newspapers (Diario de Mallorca, Ultima Hora, Majorca Daily Bulletin, Mallorca Zeitung, etc.) or sites whose legal notice says reproduction needs written permission.",
     "type 'rss': an RSS or Atom feed URL.  type 'html': a news LIST page plus linkPattern, a regular expression that matches the article links on that page.",
     "enabled: true switches a source on.  category is only the fallback: the AI chooses the real section from the story.",
     "mustMatch (optional): a regular expression; only stories that mention it are used (for national feeds).",
     "firstRun (optional, html only): how many of the newest items to take the very first time (default 2).",
     "maxPerRun limits how many stories one source can add each run (3 runs a day).",
-    "stripQuery (optional, html only): true removes ?parameters from the article links."
+    "stripQuery (optional, html only): true removes ?parameters from the article links.",
+    "Credit lines and licence notices shown under articles are set in src/data/licences.ts (by website address)."
   ],
   "maxPerRun": 3,
   "sources": [
@@ -18,7 +18,7 @@
       "url": "https://www.caib.es/pidip2front/pidipRSS?opcio=getRSS&grup=noticies&lang=ca",
       "category": "politics",
       "enabled": true,
-      "note": "Official open data of the Govern (Creative Commons Attribution). Catalan."
+      "note": "Govern open news feed. Content is licensed CC BY-SA (see caib.es legal notice): credit shown under each article."
     },
     {
       "name": "Consell de Mallorca – news",
@@ -27,7 +27,7 @@
       "linkPattern": "^https://www\\.conselldemallorca\\.es/totes-les-noticies/-/asset_publisher/[^/]+/content/",
       "category": "news",
       "enabled": true,
-      "note": "No RSS exists, so the news list page is read. Official council press releases, in Catalan."
+      "note": "Legal notice is silent on reuse; stories are rewritten and credited. Catalan."
     },
     {
       "name": "Consell d'Eivissa – news",
@@ -36,47 +36,7 @@
       "linkPattern": "^https://www\\.conselldeivissa\\.es/es/actualidad/noticias/-/asset_publisher/[^/]+/content/id/\\d+/maximized",
       "category": "news",
       "enabled": true,
-      "note": "No RSS exists, so the news list page is read. Official council press releases, in Catalan."
-    },
-    {
-      "name": "Autoritat Portuària de Balears – news",
-      "type": "html",
-      "url": "https://www.portsdebalears.com/es/noticias",
-      "linkPattern": "^https://www\\.portsdebalears\\.com/es/noticias/[^/?#]{15,}$",
-      "category": "business",
-      "enabled": true,
-      "note": "Ports of Palma, Eivissa, Maó, Alcúdia and La Savina. Official press releases, in Spanish."
-    },
-    {
-      "name": "Ajuntament de Sant Antoni de Portmany – news",
-      "type": "html",
-      "url": "https://www.santantoni.net/actualitat/noticies",
-      "linkPattern": "^https://www\\.santantoni\\.net/-/[^/?#]{20,}$",
-      "category": "news",
-      "maxPerRun": 2,
-      "enabled": true,
-      "note": "Town hall press releases (Ibiza), Catalan."
-    },
-    {
-      "name": "Ajuntament d'Eivissa – news",
-      "type": "html",
-      "url": "https://www.eivissa.es/actualidad/noticias",
-      "linkPattern": "^https://www\\.eivissa\\.es/w/[^/?#]{20,}",
-      "stripQuery": true,
-      "category": "news",
-      "maxPerRun": 2,
-      "enabled": true,
-      "note": "Town hall press releases (Eivissa town), Catalan."
-    },
-    {
-      "name": "Ajuntament d'Alcúdia – news",
-      "type": "html",
-      "url": "https://www.alcudia.net/ajuntament/ca/noticias/",
-      "linkPattern": "^https://www\\.alcudia\\.net/ajuntament/ca/noticias/[^/?#]+/$",
-      "category": "news",
-      "maxPerRun": 2,
-      "enabled": true,
-      "note": "Town hall press releases (Mallorca north), Catalan."
+      "note": "Legal notice is silent on reuse; stories are rewritten and credited. Catalan."
     },
     {
       "name": "Ajuntament de Manacor – news",
@@ -86,25 +46,18 @@
       "category": "news",
       "maxPerRun": 2,
       "enabled": true,
-      "note": "Town hall press releases (Mallorca east), Catalan."
+      "note": "Footer links a Creative Commons licence page (not read yet). Catalan."
     },
     {
-      "name": "Ajuntament de Llucmajor – news",
+      "name": "IBESTAT – Institut d'Estadística de les Illes Balears",
       "type": "html",
-      "url": "https://llucmajor.org/ca/noticies",
-      "linkPattern": "^https://llucmajor\\.org/ca/noticies/[^/?#]{8,}$",
-      "category": "news",
-      "maxPerRun": 1,
+      "url": "https://ibestat.es/noticies/?lang=ca",
+      "linkPattern": "^https://ibestat\\.es/[a-z0-9-]+-20\\d\\d/\\?lang=ca$",
+      "category": "economy",
+      "maxPerRun": 2,
+      "firstRun": 2,
       "enabled": true,
-      "note": "Town hall press releases (Mallorca south-east), Catalan. Posts less often."
-    },
-    {
-      "name": "Ajuntament de Palma – news",
-      "type": "rss",
-      "url": "https://noticies.palma.cat/inici/-/asset_publisher/q5ypd8S7ynNq/rss",
-      "category": "news",
-      "enabled": false,
-      "note": "RSS link found on palma.es. Not tested. Turn on, run Autopost once, and check the log before keeping it."
+      "note": "Statistics releases (tourism, business confidence). Reuse allowed with credit 'Font: elaboració pròpia a partir de dades de l'IBESTAT'. robots.txt asks for a 10 s delay. Catalan."
     },
     {
       "name": "EXAMPLE of a national feed: only keep stories that mention the islands",

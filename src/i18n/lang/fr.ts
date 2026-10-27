@@ -107,6 +107,8 @@ export const ui: typeof UI = {
   privacyPolicy: 'Politique de confidentialité',
   terms: 'Conditions générales',
   weatherDataBy: 'Données météo :',
+  licensedUnder: 'Les informations utilisées sont sous licence {licence} ; cet article est partagé sous la même licence.',
+  poweredBy: 'propulsé par',
 
   yourName: 'Votre nom',
   topic: 'Sujet',
@@ -140,7 +142,7 @@ export const pages: typeof PAGES = {
 <h2>Traductions</h2>
 <p>Nos articles sont rédigés en anglais puis traduits en espagnol, français et allemand, principalement à l'aide de la traduction automatique. Chaque traduction renvoie à l'original anglais, qui fait référence en cas de différence. Si vous repérez une erreur de traduction, signalez-la-nous.</p>
 <h2>Automatisation et intelligence artificielle</h2>
-<p>Certains articles courants, comme la météo quotidienne et les résumés d'annonces officielles, sont préparés avec l'aide de logiciels et d'outils d'intelligence artificielle. Un rédacteur vérifie ces brouillons par rapport à la source avant publication. Les bulletins météo automatiques sont produits à partir des données ouvertes d'Open-Meteo.</p>
+<p>Certains articles courants, comme la météo quotidienne et les résumés d'annonces officielles, sont préparés avec l'aide de logiciels et d'outils d'intelligence artificielle. Un rédacteur vérifie ces brouillons par rapport à la source avant publication. Les bulletins météo automatiques sont produits à partir des données ouvertes d'Open-Meteo. Lorsqu'un article s'appuie sur des informations publiées sous licence Creative Commons (par exemple par le Govern de les Illes Balears, CC BY-SA), nous l'indiquons sous l'article et partageons notre réécriture sous la même licence.</p>
 <h2>Images</h2>
 <p>Nous utilisons nos propres photos, des images fournies pour publication par les organisations concernées et des images sous licence libre, toujours créditées. Nous ne copions pas de photos d'autres médias.</p>
 <h2>Corrections</h2>

@@ -7,10 +7,12 @@ export const SITE = {
   email: 'news@balearictimes.com', // shown in the top bar and footer
   // Optional extra contact lines for the footer (leave '' to hide)
   phone: '',
+  // Company details shown in the footer
+  legal: 'Virtual Random LLC · Reg. No. 400481260 · Erosi Manjgaladze St. 75a, Nadzaladevi District, Tbilisi, Georgia',
   whatsapp: '', // digits only with country code, e.g. 34600000000
   social: {
     facebook: '', // e.g. https://www.facebook.com/balearictimes — shows the left social rail when set
-    instagram: '',
+    instagram: 'https://www.instagram.com/balearictimes/',
     x: '',
   },
   // Hero / banner background. Put your own landscape photo at public/images/hero.jpg
