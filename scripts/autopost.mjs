@@ -198,17 +198,32 @@ Rules:
   sports = football, basketball, sailing, cycling, running, any sport;
   tech = technology, digital, start-ups, science, energy and environment innovation.
 
-If the source is only an administrative notice with no news value for readers (meeting agenda, call for applications or tenders, internal appointment, opening hours), reply with {"skip": true} instead.
+If the source is only an administrative notice with no news value for readers (meeting agenda, call for applications or tenders, internal appointment, opening hours), reply with the single word SKIP instead.
 
-Reply with ONLY a JSON object, no other text:
-{"title": "...", "excerpt": "one-sentence summary under 200 characters", "category": "...", "body": "the article in Markdown, without the title"}`;
+Otherwise reply in EXACTLY this format, no other text, no code fences:
+TITLE: the headline
+EXCERPT: one-sentence summary under 200 characters
+CATEGORY: one of the categories above
+-----
+the article in Markdown, without the title`;
 
 const callAI = (user) => callAIRaw({ system: SYSTEM, user, maxTokens: 3000 });
 
+// Reads the AI's answer. Preferred format: TITLE / EXCERPT / CATEGORY / ----- / body.
+// Older JSON answers (and JSON with raw line breaks inside the text, which small models produce) still work.
 function parseJSON(text) {
-  const m = text.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error('AI did not return JSON');
-  return JSON.parse(m[0]);
+  text = text.replace(/^\s*```(?:json|markdown|md)?\s*\n?|\n?```\s*$/g, '').trim();
+  if (/^\s*SKIP\b/i.test(text) || /^\s*\{\s*"skip"\s*:\s*true/i.test(text)) return { skip: true };
+  const m = text.match(/^\s*TITLE:\s*(.+)\n\s*EXCERPT:\s*(.*)\n\s*CATEGORY:\s*(.*)\n\s*-{3,}\s*\n([\s\S]+)$/i);
+  if (m) {
+    const clean = (x) => x.trim().replace(/^["']|["']$/g, '');
+    return { title: clean(m[1]), excerpt: clean(m[2]), category: clean(m[3]).toLowerCase(), body: m[4].trim() };
+  }
+  const j = text.match(/\{[\s\S]*\}/);
+  if (!j) throw new Error('AI answer not in the expected format');
+  try { return JSON.parse(j[0]); } catch {}
+  try { return JSON.parse(j[0].replace(/[\u0000-\u001f]/g, (c) => (c === '\n' ? '\\n' : c === '\t' ? '\\t' : ' '))); } catch {}
+  throw new Error('AI answer could not be read');
 }
 
 // ---- Safety gate: with AUTOPUBLISH=true a story still stays a draft for a human when it touches risky ground.
