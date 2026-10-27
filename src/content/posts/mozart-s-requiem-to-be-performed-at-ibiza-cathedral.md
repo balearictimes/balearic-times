@@ -1,16 +1,19 @@
 ---
-title: "Mozart's Requiem to be performed at Ibiza Cathedral"
-date: 2026-10-27T17:58:10.644Z
+title: Mozart's Requiem to be performed at Ibiza Cathedral
 category: culture
-excerpt: "Mozart's Requiem at Ibiza Cathedral"
-image: "/images/cat-culture.svg"
-imageAlt: "Balearic Times culture"
-author: "Balearic Times Newsroom"
-sourceName: "Consell d'Eivissa – news"
-sourceUrl: "https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1226350/maximized"
-draft: true
+date: 2026-10-27T17:58:10.644Z
+excerpt: Mozart's Requiem at Ibiza Cathedral
+image: /images/cat-culture.svg
+imageAlt: Balearic Times culture
+imageCredit: ''
+author: Balearic Times Newsroom
+sourceName: Consell d'Eivissa – news
+sourceUrl: https://www.conselldeivissa.es/es/actualidad/noticias/-/asset_publisher/cdspH8T9sYJp/content/id/1226350/maximized
+featured: false
+draft: false
 noindex: false
 autopost: true
+updated: ''
 ---
 
 ## Introduction to the Event
