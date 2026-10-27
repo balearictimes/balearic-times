@@ -75,6 +75,16 @@ Then add sources in **`scripts/sources.json`**: paste each RSS feed address and 
 
 Check each site's *Aviso legal*. **Never add other newspapers.** Rewriting their articles is what creates copyright problems and Google penalties.
 
+### Switching on automatic publishing
+
+Set the GitHub variable `AUTOPUBLISH` = `true` (repo → Settings → Secrets and variables → Actions → Variables). With it on, stories from the official sources go live by themselves, **except** that the robot keeps a story as a draft for you when:
+
+- it touches a sensitive topic (arrests, courts, deaths, accidents, injuries, minors, fraud, abuse …), or
+- it contains a number (3+ digits) that does not appear in the source text, or
+- it is unusually long.
+
+The Autopost log says `PUBLISHED` or `draft … held for review: <reason>` for every story. Weather posts always publish by themselves. Set `AUTOPUBLISH` back to `false` any time to review everything again.
+
 ### What the autoposter protects against
 
 - It writes in its own words from the facts in the source, and links the source at the bottom of every article.

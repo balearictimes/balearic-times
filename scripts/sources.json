@@ -7,7 +7,8 @@
     "enabled: true switches a source on.  category is only the fallback: the AI chooses the real section from the story.",
     "mustMatch (optional): a regular expression; only stories that mention it are used (for national feeds).",
     "firstRun (optional, html only): how many of the newest items to take the very first time (default 2).",
-    "maxPerRun limits how many stories one source can add each run (3 runs a day)."
+    "maxPerRun limits how many stories one source can add each run (3 runs a day).",
+    "stripQuery (optional, html only): true removes ?parameters from the article links."
   ],
   "maxPerRun": 3,
   "sources": [
@@ -45,6 +46,57 @@
       "category": "business",
       "enabled": true,
       "note": "Ports of Palma, Eivissa, Maó, Alcúdia and La Savina. Official press releases, in Spanish."
+    },
+    {
+      "name": "Ajuntament de Sant Antoni de Portmany – news",
+      "type": "html",
+      "url": "https://www.santantoni.net/actualitat/noticies",
+      "linkPattern": "^https://www\\.santantoni\\.net/-/[^/?#]{20,}$",
+      "category": "news",
+      "maxPerRun": 2,
+      "enabled": true,
+      "note": "Town hall press releases (Ibiza), Catalan."
+    },
+    {
+      "name": "Ajuntament d'Eivissa – news",
+      "type": "html",
+      "url": "https://www.eivissa.es/actualidad/noticias",
+      "linkPattern": "^https://www\\.eivissa\\.es/w/[^/?#]{20,}",
+      "stripQuery": true,
+      "category": "news",
+      "maxPerRun": 2,
+      "enabled": true,
+      "note": "Town hall press releases (Eivissa town), Catalan."
+    },
+    {
+      "name": "Ajuntament d'Alcúdia – news",
+      "type": "html",
+      "url": "https://www.alcudia.net/ajuntament/ca/noticias/",
+      "linkPattern": "^https://www\\.alcudia\\.net/ajuntament/ca/noticias/[^/?#]+/$",
+      "category": "news",
+      "maxPerRun": 2,
+      "enabled": true,
+      "note": "Town hall press releases (Mallorca north), Catalan."
+    },
+    {
+      "name": "Ajuntament de Manacor – news",
+      "type": "html",
+      "url": "https://manacor.org/ca/noticies",
+      "linkPattern": "^https://manacor\\.org/ca/noticies/[^/?#]{15,}$",
+      "category": "news",
+      "maxPerRun": 2,
+      "enabled": true,
+      "note": "Town hall press releases (Mallorca east), Catalan."
+    },
+    {
+      "name": "Ajuntament de Llucmajor – news",
+      "type": "html",
+      "url": "https://llucmajor.org/ca/noticies",
+      "linkPattern": "^https://llucmajor\\.org/ca/noticies/[^/?#]{8,}$",
+      "category": "news",
+      "maxPerRun": 1,
+      "enabled": true,
+      "note": "Town hall press releases (Mallorca south-east), Catalan. Posts less often."
     },
     {
       "name": "Ajuntament de Palma – news",

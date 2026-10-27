@@ -7,7 +7,8 @@
 //     sources only), and asks an AI model to write an ORIGINAL English news article from each.
 //     Drafts that copy too much wording from the source, or are too thin, are rejected.
 //
-// New stories are saved as drafts (draft: true) unless AUTOPUBLISH=true.
+// New stories are saved as drafts (draft: true) unless AUTOPUBLISH=true. Even then, stories on sensitive topics
+// (crime, court, deaths, minors …) or with numbers that are not in the source are held back as drafts.
 //
 // Env:
 //   AUTOPUBLISH=true|false          publish immediately or leave as drafts (default false)
@@ -197,6 +198,8 @@ Rules:
   sports = football, basketball, sailing, cycling, running, any sport;
   tech = technology, digital, start-ups, science, energy and environment innovation.
 
+If the source is only an administrative notice with no news value for readers (meeting agenda, call for applications or tenders, internal appointment, opening hours), reply with {"skip": true} instead.
+
 Reply with ONLY a JSON object, no other text:
 {"title": "...", "excerpt": "one-sentence summary under 200 characters", "category": "...", "body": "the article in Markdown, without the title"}`;
 
@@ -206,6 +209,19 @@ function parseJSON(text) {
   const m = text.match(/\{[\s\S]*\}/);
   if (!m) throw new Error('AI did not return JSON');
   return JSON.parse(m[0]);
+}
+
+// ---- Safety gate: with AUTOPUBLISH=true a story still stays a draft for a human when it touches risky ground.
+const RISKY = /\b(arrest\w*|detain\w*|custody|murder\w*|kill\w*|dead|death|died|dies|fatal\w*|body|suicid\w*|rape\w*|sexual\w*|abus\w*|assault\w*|stabb\w*|shot|shooting|court|trial|jail|prison|sentenc\w*|charged|accused|suspect\w*|investigat\w*|minors?|missing|overdose|drown\w*|injur\w*|crash\w*|victims?|lawsuit|fraud|corrupt\w*|defamat\w*)\b/i;
+const digitsOf = (s) => new Set((String(s).match(/\d[\d.,]*\d|\d/g) ?? []).map((n) => n.replace(/\D/g, '')));
+export function needsReview(out, sourceText) {
+  const article = `${out.title} ${out.excerpt ?? ''} ${out.body}`;
+  const risky = article.match(RISKY);
+  if (risky) return `sensitive topic ("${risky[0]}")`;
+  const src = digitsOf(sourceText);
+  for (const n of digitsOf(article)) if (n.length >= 3 && !src.has(n)) return `number ${n} is not in the source`;
+  if (String(out.body).split(/\s+/).length > 1100) return 'unusually long';
+  return null;
 }
 
 // Share of the article's 8-word sequences that also appear in the source.
@@ -238,13 +254,13 @@ function readFeed(raw) {
 }
 
 // For sites without RSS: read the news LIST page and pick out the article links that match `linkPattern`.
-function readList(html, baseUrl, pattern) {
+function readList(html, baseUrl, pattern, stripQuery = false) {
   const { document } = parseHTML(html);
   const re = new RegExp(pattern);
   const byLink = new Map();
   for (const a of document.querySelectorAll('a[href]')) {
     let link;
-    try { link = new URL(a.getAttribute('href'), baseUrl).href.split('#')[0]; } catch { continue; }
+    try { const u = new URL(a.getAttribute('href'), baseUrl); if (stripQuery) u.search = ''; link = u.href.split('#')[0]; } catch { continue; }
     if (!re.test(link)) continue;
     const text = stripTags(a.textContent || a.getAttribute('title') || '');
     if (!byLink.has(link) || text.length > byLink.get(link).length) byLink.set(link, text);
@@ -266,13 +282,13 @@ async function newsPosts() {
 
   const seen = fs.existsSync(SEEN_FILE) ? JSON.parse(fs.readFileSync(SEEN_FILE, 'utf8')) : {};
   const cutoff = Date.now() - 3 * 864e5;
-  const max = cfg.maxPerRun ?? 4;
 
   for (const src of enabled) {
+    const max = src.maxPerRun ?? cfg.maxPerRun ?? 4;
     let items = [];
     try {
       const raw = await fetchText(src.url);
-      items = src.type === 'html' ? readList(raw, src.url, src.linkPattern) : readFeed(raw);
+      items = src.type === 'html' ? readList(raw, src.url, src.linkPattern, src.stripQuery) : readFeed(raw);
     } catch (e) { log(`news: source failed ${src.name}: ${e.message}`); continue; }
     // List pages have no dates: the first time we see one, only take the newest few so we don't dump its whole history
     if (src.type === 'html') {
@@ -297,12 +313,14 @@ async function newsPosts() {
         if (src.mustMatch && !new RegExp(src.mustMatch, 'i').test(`${it.title} ${text}`)) { seen[it.link] = 'not-local'; continue; }
 
         const out = parseJSON(await callAI(`Source: ${src.name}\nURL: ${it.link}\nTitle: ${it.title}\n\n${text}`));
+        if (out.skip) { seen[it.link] = 'not-newsworthy'; log(`skip (no news value): ${it.title}`); continue; }
         const words = String(out.body ?? '').split(/\s+/).length;
         const ov = overlap(out.body ?? '', text);
         if (words < 250) { seen[it.link] = 'thin'; log(`skip (only ${words} words): ${it.title}`); continue; }
         if (ov > 0.12) { seen[it.link] = 'too-similar'; log(`skip (${Math.round(ov * 100)}% wording overlap with source): ${it.title}`); continue; }
 
         const category = CATEGORIES.includes(out.category) && out.category !== 'weather' ? out.category : src.category ?? 'news';
+        const review = AUTOPUBLISH ? needsReview(out, text) : 'AUTOPUBLISH is off';
         const slug = uniqueSlug(slugify(out.title));
         if (DRY) { log(`(dry run) would write ${slug} – ${words} words`); continue; }
         writePost({
@@ -316,13 +334,13 @@ async function newsPosts() {
           author: 'Balearic Times Newsroom',
           sourceName: src.name,
           sourceUrl: it.link,
-          draft: !AUTOPUBLISH,
+          draft: !!review,
           autopost: true,
           body: out.body,
         });
         seen[it.link] = slug;
         made++;
-        log(`${AUTOPUBLISH ? 'published' : 'draft'}: ${slug} (${words} words, overlap ${Math.round(ov * 100)}%)`);
+        log(`${review ? 'draft' : 'PUBLISHED'}: ${slug} (${words} words, overlap ${Math.round(ov * 100)}%)${review && AUTOPUBLISH ? ` – held for review: ${review}` : ''}`);
       } catch (e) {
         log(`error on ${it.link}: ${e.message}`);
       }
