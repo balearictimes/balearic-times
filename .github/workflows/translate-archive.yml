@@ -34,7 +34,7 @@ jobs:
       - run: npm ci
       - name: Translate
         env:
-          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_PROVIDER: ${{ vars.TRANSLATE_PROVIDER || vars.AI_PROVIDER }}
           AI_MODEL: ${{ vars.TRANSLATE_MODEL || vars.AI_MODEL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}

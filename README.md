@@ -75,6 +75,10 @@ Then add sources in **`scripts/sources.json`**: paste each RSS feed address and 
 
 Check each site's *Aviso legal*. **Never add other newspapers.** Rewriting their articles is what creates copyright problems and Google penalties.
 
+### Using two AI providers (writing vs translating)
+
+Writing new stories uses `AI_PROVIDER`; translating uses `TRANSLATE_PROVIDER` (if empty, it uses `AI_PROVIDER`). Example: `AI_PROVIDER` = `workers-ai` (needs `CF_ACCOUNT_ID` and `CF_API_TOKEN`) and `TRANSLATE_PROVIDER` = `openrouter` (needs `OPENROUTER_API_KEY`). Leave `AI_MODEL` and `TRANSLATE_MODEL` empty unless you know a model that exists on that provider; the defaults are chosen for you.
+
 ### Switching on automatic publishing
 
 Set the GitHub variable `AUTOPUBLISH` = `true` (repo → Settings → Secrets and variables → Actions → Variables). With it on, stories from the official sources go live by themselves, **except** that the robot keeps a story as a draft for you when:
