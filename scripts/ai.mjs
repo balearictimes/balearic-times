@@ -8,7 +8,10 @@
 //   gemini      GEMINI_API_KEY                    (free tier at https://aistudio.google.com/apikey)
 //   workers-ai  CF_ACCOUNT_ID + CF_API_TOKEN      (free daily allowance on Cloudflare)
 
-export class QuotaError extends Error {}
+export class QuotaError extends Error {
+  // daily = the free allowance for the whole day is used up (waiting a minute won't help)
+  constructor(message, daily = false) { super(message); this.daily = daily; }
+}
 
 export function providerName() {
   const e = process.env;
@@ -46,7 +49,8 @@ async function json(res, label) {
   let j;
   try { j = JSON.parse(text); } catch { j = { raw: text.slice(0, 300) }; }
   if (res.status === 429 || /quota|rate.?limit|free-models-per-day/i.test(JSON.stringify(j).slice(0, 600)) && !res.ok) {
-    throw new QuotaError(`${label}: rate limit or daily quota reached (${res.status})`);
+    const body = JSON.stringify(j).slice(0, 600);
+    throw new QuotaError(`${label}: rate limit (${res.status}) ${body.slice(0, 160)}`, /per.?day|daily/i.test(body));
   }
   if (!res.ok) throw new Error(`${label}: ${res.status} ${JSON.stringify(j).slice(0, 300)}`);
   return j;
@@ -90,11 +94,13 @@ export async function callAI({ system, user, maxTokens = 3000 }) {
         if (!out) throw new Error(`${model}: empty answer`);
         return out;
       } catch (err) {
-        if (err instanceof QuotaError && /per.?day/i.test(err.message)) throw err;
+        if (err instanceof QuotaError && err.daily) throw err;
         if (/ 404|no endpoints|unavailable|not found|\b400\b|\b403\b/i.test(err.message)) badModels.add(model); // don't keep asking a dead model
         errors.push(String(err.message).slice(0, 140));
       }
     }
+    // every model said "too many requests": that is a limit, not a broken article
+    if (errors.length && errors.every((m) => /rate limit \(429\)/.test(m))) throw new QuotaError(`all free models are rate-limited right now`, false);
     throw new Error(`all free models failed: ${errors.join(' | ')}`);
   }
 

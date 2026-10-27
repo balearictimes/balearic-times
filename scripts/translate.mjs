@@ -94,7 +94,9 @@ const words = (s) => (s.match(/\S+/g) ?? []).length;
 const headingsOf = (md) => (md.match(/^#{2,4}\s+(.+)$/gm) ?? []).map((h) => h.replace(/^#+\s+/, '').trim());
 // English headings left untouched in the translation (only headings of 2+ words count; "Mallorca" is the same in every language)
 export function untranslatedHeadings(srcBody, outBody) {
-  const en = headingsOf(srcBody).filter((h) => h.split(/\s+/).length >= 2);
+  // a heading made only of Capitalised Words is a name ("Rodrigo Cuevas / Valeria Castro") and is rightly the same in every language
+  const isName = (h) => h.split(/[\s/&,]+/).filter(Boolean).every((w) => /^[\p{Lu}\d]/u.test(w));
+  const en = headingsOf(srcBody).filter((h) => h.split(/\s+/).length >= 2 && !isName(h));
   const out = new Set(headingsOf(outBody).map((h) => h.toLowerCase()));
   return en.filter((h) => out.has(h.toLowerCase()));
 }
@@ -161,12 +163,20 @@ let done = 0, failed = 0;
 for (const { p, l, update } of todo) {
   if (done >= MAX) break;
   try {
-    const t = await translateOne(p, l);
+    let t;
+    try { t = await translateOne(p, l); }
+    catch (e) {
+      // Per-minute limit (free tier: 20 requests/minute): wait a minute and try this article again, once.
+      if (!(e instanceof QuotaError) || e.daily) throw e;
+      console.log(`… rate limit, waiting 70 s (${e.message})`);
+      await sleep(70000);
+      t = await translateOne(p, l);
+    }
     save(l, p, t);
     done++;
     console.log(`✓ ${update ? 'updated' : 'new'} ${l.code} ${p.slug}`);
   } catch (e) {
-    if (e instanceof QuotaError) { console.log(`Daily limit reached — stopping. (${e.message})`); break; }
+    if (e instanceof QuotaError) { console.log(`AI limit reached — stopping, the next run carries on. (${e.message})`); break; }
     failed++;
     console.log(`✗ ${l.code} ${p.slug}: ${e.message}`);
     if (failed >= 8) { console.log('Too many failures — stopping this run.'); break; }

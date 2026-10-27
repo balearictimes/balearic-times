@@ -52,5 +52,9 @@ jobs:
           git add src/content/translations
           if git diff --cached --quiet; then echo "Nothing new."; exit 0; fi
           git commit -m "Translate archive $(date -u +'%Y-%m-%d')"
-          git pull --rebase
-          git push
+          # someone else may have pushed meanwhile: rebase on top and retry
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash && git push && exit 0
+            echo "Push attempt $i failed, retrying..."; sleep $((i*5))
+          done
+          exit 1
