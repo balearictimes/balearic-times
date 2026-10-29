@@ -76,6 +76,14 @@ const hasSocial = Object.values(SITE.social).some(Boolean);
   <link rel="stylesheet" href="/vendor/font-awesome/css/font-awesome.min.css" />
   <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <!-- Google tag (gtag.js) -->
+  <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-L54X4EY9SG"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L54X4EY9SG');
+  </script>
 </head>
 <body class={path === home ? 'sf-home' : ''}>
   <div class="star-topbar">
